@@ -1,66 +1,30 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { Easing, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withTiming } from 'react-native-reanimated';
 
 import type { RootStackParamList } from '../navigation/types';
 import { colors, radii, spacing } from '../theme/theme';
 
-const AnimatedView = Animated.createAnimatedComponent(View);
+// Using static view for splash animation placeholder while native reanimated is removed.
+const AnimatedView = View;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export function SplashScreen({ navigation }: Props) {
-  const progress = useSharedValue(0);
-  const pulse = useSharedValue(0);
-
   useEffect(() => {
-    progress.value = withTiming(1, {
-      duration: 850,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    pulse.value = withDelay(
-      150,
-      withRepeat(
-        withTiming(1, {
-          duration: 1400,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        -1,
-        true,
-      ),
-    );
-
     const timer = setTimeout(() => {
       navigation.replace('Home');
-    }, 2200);
+    }, 1200);
 
     return () => clearTimeout(timer);
-  }, [navigation, progress, pulse]);
-
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0.1, 1]),
-    transform: [
-      { translateY: interpolate(progress.value, [0, 1], [24, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [0.92, 1]) },
-    ],
-  }));
-
-  const auraStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(pulse.value, [0, 1], [0.18, 0.45]),
-    transform: [
-      { scale: interpolate(pulse.value, [0, 1], [1, 1.16]) },
-    ],
-    backgroundColor: interpolateColor(pulse.value, [0, 1], ['rgba(216, 180, 90, 0.16)', 'rgba(92, 225, 230, 0.16)']),
-  }));
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
       <View style={styles.orbTop} />
       <View style={styles.orbBottom} />
-      <AnimatedView style={[styles.card, cardStyle]}>
-        <Animated.View style={[styles.aura, auraStyle]} />
+      <AnimatedView style={[styles.card]}>
+        <View style={[styles.aura]} />
         <View style={styles.logoShell}>
           <Text style={styles.logoMark}>KA</Text>
         </View>

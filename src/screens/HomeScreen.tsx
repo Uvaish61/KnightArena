@@ -1,7 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Surface } from '../components/Surface';
@@ -27,7 +26,7 @@ export function HomeScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      <Animated.View entering={FadeInUp.duration(650)} style={styles.heroCardWrap}>
+      <View style={styles.heroCardWrap}>
         <Surface style={styles.heroCard}>
           <Text style={styles.heroEyebrow}>Welcome back</Text>
           <Text style={styles.heroTitle}>Ready to open the board?</Text>
@@ -43,9 +42,9 @@ export function HomeScreen({ navigation }: Props) {
             <View style={styles.statChip}><Text style={styles.statChipText}>AI pipeline ready</Text></View>
           </View>
         </Surface>
-      </Animated.View>
+      </View>
 
-      <Animated.View entering={FadeInDown.delay(120).duration(650)}>
+      <View>
         <Surface style={styles.resultCard}>
           <View style={styles.cardHeaderRow}>
             <Text style={styles.sectionTitle}>Last Match Result</Text>
@@ -57,7 +56,7 @@ export function HomeScreen({ navigation }: Props) {
             We will store match history, turns, and outcomes locally so the app stays fast even when offline.
           </Text>
         </Surface>
-      </Animated.View>
+      </View>
 
       <View style={styles.footerRow}>
         <Pressable style={styles.footerButton} onPress={() => navigation.navigate('GameHistory')}>
