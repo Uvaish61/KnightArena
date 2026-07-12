@@ -22,11 +22,13 @@ export function SplashScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.patternWrap}>
+      <View style={[styles.patternWrap, { top: insets.top }]}>
         <ChessPattern size={160} color={colors.textPrimary} opacity={0.04} />
       </View>
 
-      <View style={styles.glow} />
+      <View style={styles.glowWrap} pointerEvents="none">
+        <View style={styles.glow} />
+      </View>
 
       <View style={styles.center}>
         <Text style={styles.knight}>♞</Text>
@@ -62,16 +64,22 @@ const styles = StyleSheet.create({
   },
   patternWrap: {
     position: 'absolute',
-    top: 0,
     right: 0,
   },
-  glow: {
+  glowWrap: {
     position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  glow: {
     width: 320,
     height: 320,
-    borderRadius: 320,
-    backgroundColor: colors.accentGlow,
-    opacity: 0.55,
+    borderRadius: 160,
+    backgroundColor: 'rgba(232,64,64,0.18)',
   },
   center: {
     alignItems: 'center',
@@ -80,7 +88,7 @@ const styles = StyleSheet.create({
   knight: {
     fontSize: 96,
     color: colors.accent,
-    textShadowColor: colors.accentGlow,
+    textShadowColor: 'rgba(232,64,64,0.5)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 32,
   },
@@ -117,6 +125,8 @@ const styles = StyleSheet.create({
   },
   bottom: {
     position: 'absolute',
+    left: 0,
+    right: 0,
     bottom: 0,
     alignItems: 'center',
   },
