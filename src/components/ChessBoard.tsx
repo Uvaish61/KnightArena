@@ -90,10 +90,10 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, onSqu
               const isPossible = possibleMoves.includes(cell.square);
 
               return (
-                <View
+                <Pressable
                   key={cell.square}
                   style={[styles.square, { width: SQ, height: SQ, backgroundColor: getSquareBg(light, cell.square) }]}
-                  onTouchEnd={() => onSquarePress(cell.square)}
+                  onPress={() => onSquarePress(cell.square)}
                 >
                   {fileIndex === 0 && (
                     <Text style={[styles.coordLabel, styles.rankLabel, { color: light ? 'rgba(92,20,20,0.5)' : 'rgba(240,213,168,0.45)' }]}>
@@ -132,7 +132,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, onSqu
                       ]}
                     />
                   )}
-                </View>
+                </Pressable>
               );
             })}
           </View>
