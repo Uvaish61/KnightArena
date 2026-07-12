@@ -21,6 +21,7 @@ const navigationTheme = {
     text: colors.text,
     notification: colors.accent,
   },
+  fonts: DarkTheme.fonts || DefaultTheme.fonts,
 };
 
 export default function App() {
