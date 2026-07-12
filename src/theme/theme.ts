@@ -10,10 +10,30 @@ export const colors = {
   textSoft: 'rgba(244, 247, 251, 0.52)',
   primary: '#D8B45A',
   primaryDark: '#A8822A',
-  accent: '#5CE1E6',
+  accent: '#e84040',
   success: '#4DD08A',
   danger: '#F56C6C',
   warning: '#E6B85C',
+
+  // Redesign tokens (premium red/black chess theme) — used by Splash/Home/GameSetup onward
+  bg: '#0a0808',
+  bgHero: '#1a0808',
+  surfaceBorder: 'rgba(255,255,255,0.07)',
+  accentGlow: 'rgba(232,64,64,0.35)',
+  accentMuted: 'rgba(232,64,64,0.15)',
+  accentBorder: 'rgba(232,64,64,0.25)',
+  textPrimary: '#ffffff',
+  textSecondary: 'rgba(255,255,255,0.5)',
+  textTertiary: 'rgba(255,255,255,0.28)',
+  textLabel: 'rgba(232,64,64,0.9)',
+};
+
+export const fonts = {
+  heading: 'DMSerifDisplay-Regular',
+  body: 'SpaceGrotesk-Regular',
+  bodyMedium: 'SpaceGrotesk-Medium',
+  bodySemiBold: 'SpaceGrotesk-SemiBold',
+  bodyBold: 'SpaceGrotesk-Bold',
 };
 
 export const spacing = {
