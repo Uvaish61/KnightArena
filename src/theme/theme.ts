@@ -26,6 +26,17 @@ export const colors = {
   textSecondary: 'rgba(255,255,255,0.5)',
   textTertiary: 'rgba(255,255,255,0.28)',
   textLabel: 'rgba(232,64,64,0.9)',
+
+  // Glass surface for HUD/action-bar chrome (translucent, over `bg`) — used from GameScreen onward
+  surfaceGlass: 'rgba(255,255,255,0.04)',
+
+  // Chess board squares/highlights — GameScreen
+  boardLight: '#f0d5a8',
+  boardDark: '#5c1414',
+  boardLastMoveLight: '#dace72',
+  boardLastMoveDark: '#8a7a1e',
+  boardSelectedLight: '#eede58',
+  boardSelectedDark: '#a89a18',
 };
 
 export const fonts = {
