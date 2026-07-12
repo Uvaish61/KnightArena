@@ -2,8 +2,20 @@ export type RootStackParamList = {
   Splash: undefined;
   Home: undefined;
   GameSetup: undefined;
-  Game: undefined;
-  Result: undefined;
+  Game: {
+    mode: 'pvp' | 'ai';
+    player1: string;
+    player2: string;
+    timer: number | null;
+    aiDifficulty?: 'easy' | 'medium' | 'hard';
+  };
+  Result: {
+    winner: 'w' | 'b' | 'draw' | null;
+    player1: string;
+    player2: string;
+    moveCount: number;
+    pgn: string;
+  };
   GameHistory: undefined;
   Settings: undefined;
 };
