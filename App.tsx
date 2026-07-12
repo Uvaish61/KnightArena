@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -25,14 +25,11 @@ const navigationTheme = {
 };
 
 export default function App() {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme !== 'light';
-
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <View style={styles.root}>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
+          <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
           <NavigationContainer theme={navigationTheme}>
             <AppNavigator />
           </NavigationContainer>
