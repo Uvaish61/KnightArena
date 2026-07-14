@@ -151,7 +151,7 @@ export function ResultScreen({ navigation, route }: Props) {
 
       <PrimaryButton
         label="Play Again"
-        onPress={restartGame}
+        onPress={() => navigation.replace('GameSetup')}
         style={styles.primaryButton}
       />
 

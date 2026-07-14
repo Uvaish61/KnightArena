@@ -3,6 +3,8 @@ import { RouteProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
   Splash: undefined;
+  Home: undefined;
+  GameSetup: undefined;
   Game: {
     mode: 'pvp' | 'ai';
     player1: string;
@@ -24,6 +26,8 @@ export type RootStackParamList = {
 };
 
 export type SplashNavProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
+export type HomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+export type GameSetupNavProp = NativeStackNavigationProp<RootStackParamList, 'GameSetup'>;
 export type GameNavProp = NativeStackNavigationProp<RootStackParamList, 'Game'>;
 export type GameRouteProp = RouteProp<RootStackParamList, 'Game'>;
 export type ResultNavProp = NativeStackNavigationProp<RootStackParamList, 'Result'>;

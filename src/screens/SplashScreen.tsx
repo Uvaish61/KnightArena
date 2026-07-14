@@ -14,12 +14,7 @@ export function SplashScreen({ navigation }: Props) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Game', {
-        mode: 'pvp',
-        player1: 'White',
-        player2: 'Black',
-        timer: null,
-      });
+      navigation.replace('Home');
     }, 2200);
 
     return () => clearTimeout(timer);
