@@ -14,7 +14,7 @@ export function SplashScreen({ navigation }: Props) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Home');
+      navigation.replace('GameSetup');
     }, 2200);
 
     return () => clearTimeout(timer);

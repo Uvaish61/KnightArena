@@ -1,6 +1,5 @@
 export type RootStackParamList = {
   Splash: undefined;
-  Home: undefined;
   GameSetup: undefined;
   Game: {
     mode: 'pvp' | 'ai';

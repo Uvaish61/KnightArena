@@ -25,7 +25,7 @@ export function GameSetupScreen({ navigation }: Props) {
           <Text style={styles.item}>Move suggestions and theme selection</Text>
         </View>
 
-        <PrimaryButton label="Back to Home" variant="secondary" onPress={() => navigation.popToTop()} style={styles.button} />
+        <PrimaryButton label="Back" variant="secondary" onPress={() => navigation.popToTop()} style={styles.button} />
       </Surface>
     </View>
   );

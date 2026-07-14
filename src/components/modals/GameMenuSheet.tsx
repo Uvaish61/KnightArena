@@ -82,7 +82,7 @@ export function GameMenuSheet({ visible, onResume, onOfferDraw, onUndo, onResign
                     <View style={styles.quitDivider} />
                     <Pressable onPress={onQuitHome} style={styles.quitButton}>
                         <Home size={16} color={colors.textMuted} />
-                        <Text style={styles.quitText}>Quit to Home</Text>
+                        <Text style={styles.quitText}>Quit to Start</Text>
                     </Pressable>
                 </View>
             </View>

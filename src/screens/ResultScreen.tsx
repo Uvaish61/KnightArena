@@ -149,7 +149,7 @@ export function ResultScreen({ navigation, route }: Props) {
         </Pressable>
         <Pressable style={styles.secondaryButton} onPress={() => navigation.popToTop()}>
           <RotateCcw size={18} color={colors.textPrimary} />
-          <Text style={styles.secondaryLabel}>Home</Text>
+          <Text style={styles.secondaryLabel}>Start</Text>
         </Pressable>
       </View>
     </View>

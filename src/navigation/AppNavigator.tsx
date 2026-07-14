@@ -1,7 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { HomeScreen } from '../screens/HomeScreen';
 import { GameSetupScreen } from '../screens/GameSetupScreen';
 import { GameHistoryScreen } from '../screens/GameHistoryScreen';
 import { GameScreen } from '../screens/GameScreen';
@@ -25,7 +24,6 @@ export function AppNavigator() {
       }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="GameSetup" component={GameSetupScreen} />
       <Stack.Screen name="Game" component={GameScreen} />
       <Stack.Screen name="Result" component={ResultScreen} />
