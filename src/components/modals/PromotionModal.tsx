@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSharedValue, withSpring, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts, radii, shadows, spacing } from '../../theme/theme';
 
@@ -19,27 +18,24 @@ const PIECES = [
 ] as const;
 
 export function PromotionModal({ visible, color, onSelect, onCancel }: PromotionModalProps) {
-  const scale = useSharedValue(0.85);
-  const opacity = useSharedValue(0);
+  const scale = useRef(new Animated.Value(0.85)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
-      scale.value = withSpring(1, { damping: 14, stiffness: 160 });
-      opacity.value = withTiming(1, { duration: 220 });
+      Animated.parallel([
+        Animated.spring(scale, { toValue: 1, damping: 14, stiffness: 160, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 220, useNativeDriver: true }),
+      ]).start();
     }
   }, [opacity, scale, visible]);
-
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }],
-  }));
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
         <View style={styles.centerWrap}>
-          <View style={styles.cardOuter}>
+          <Animated.View style={[styles.cardOuter, { opacity, transform: [{ scale }] }]}>
             <View style={styles.cardInner}>
               <Text style={styles.kicker}>PAWN REACHES THE END</Text>
               <Text style={styles.title}>Choose a piece</Text>
@@ -60,7 +56,7 @@ export function PromotionModal({ visible, color, onSelect, onCancel }: Promotion
                 <Text style={styles.cancelText}>Cancel move</Text>
               </Pressable>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </View>
     </Modal>

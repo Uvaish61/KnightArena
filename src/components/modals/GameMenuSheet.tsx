@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Play, Handshake, RotateCcw, Flag, Home } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,11 +18,6 @@ type OptionStyle = 'primary' | 'surface' | 'destructive';
 
 export function GameMenuSheet({ visible, onResume, onOfferDraw, onUndo, onResign, onQuitHome }: GameMenuSheetProps) {
   const insets = useSafeAreaInsets();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (visible) setOpen(true);
-  }, [visible]);
 
   const options = useMemo(
     () => [
@@ -64,9 +59,9 @@ export function GameMenuSheet({ visible, onResume, onOfferDraw, onUndo, onResign
   );
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onResume}>
       <View style={styles.backdrop}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={() => setOpen(false)} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onResume} />
         <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 16) }]}>
           <View style={styles.handle} />
           <Text style={styles.kicker}>GAME PAUSED</Text>
