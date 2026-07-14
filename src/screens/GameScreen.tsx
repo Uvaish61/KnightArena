@@ -47,6 +47,7 @@ export function GameScreen({ navigation, route }: Props) {
   const resumeGame = useGameStore((s) => s.resumeGame);
 
   const [promotion, setPromotion] = useState<{ from: string; to: string; color: 'w' | 'b' } | null>(null);
+  const matchStartedAt = useRef(Date.now());
 
   useChessTimer(!!timer && status === 'playing');
 
@@ -63,9 +64,11 @@ export function GameScreen({ navigation, route }: Props) {
       player2,
       moveCount: moveHistory.length,
       pgn: chess.pgn(),
+      durationMs: Date.now() - matchStartedAt.current,
+      captureCount: capturedByWhite.length + capturedByBlack.length,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [capturedByBlack.length, capturedByWhite.length, chess, moveHistory.length, navigation, player1, player2, status, winner]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {

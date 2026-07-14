@@ -15,6 +15,8 @@ export type RootStackParamList = {
     player2: string;
     moveCount: number;
     pgn: string;
+    durationMs: number;
+    captureCount: number;
   };
   GameHistory: undefined;
   Settings: undefined;
