@@ -162,6 +162,15 @@ export function GameScreen({ navigation, route }: Props) {
     });
   };
 
+  const restartGame = () => {
+    navigation.replace('Game', {
+      mode: 'pvp',
+      player1: 'White',
+      player2: 'Black',
+      timer: null,
+    });
+  };
+
   const movePairs = useMemo(() => {
     const pairs: Array<{ n: number; white?: string; black?: string }> = [];
     for (let i = 0; i < moveHistory.length; i += 2) {
@@ -269,7 +278,7 @@ export function GameScreen({ navigation, route }: Props) {
         }}
         onQuitHome={() => {
           setShowMenu(false);
-          navigation.popToTop();
+          restartGame();
         }}
       />
       <CheckAlert visible={showCheck} onDismiss={() => setShowCheck(false)} />
