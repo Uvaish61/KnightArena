@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, AppState, BackHandler, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, AppState, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft, Flag, Handshake, Lightbulb, MoreHorizontal, RotateCcw } from 'lucide-react-native';
 
 import { ChessBoard } from '../components/ChessBoard';
 import { PlayerStrip } from '../components/PlayerStrip';
+import { PromotionModal } from '../components/modals/PromotionModal';
+import { GameMenuSheet } from '../components/modals/GameMenuSheet';
+import { CheckAlert } from '../components/game/CheckAlert';
 import { useChessTimer } from '../hooks/useChessTimer';
 import { useGameStore } from '../store/gameStore';
 import type { RootStackParamList } from '../navigation/types';
@@ -47,6 +50,8 @@ export function GameScreen({ navigation, route }: Props) {
   const resumeGame = useGameStore((s) => s.resumeGame);
 
   const [promotion, setPromotion] = useState<{ from: string; to: string; color: 'w' | 'b' } | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showCheck, setShowCheck] = useState(false);
   const matchStartedAt = useRef(Date.now());
 
   useChessTimer(!!timer && status === 'playing');
@@ -106,8 +111,7 @@ export function GameScreen({ navigation, route }: Props) {
 
     if (selectedSquare && possibleMoves.includes(square)) {
       const piece = chess.get(selectedSquare as any);
-      const destRank = square[1];
-      const isPromotion = piece?.type === 'p' && (destRank === '8' || destRank === '1');
+      const isPromotion = piece?.type === 'p' && (square[1] === '8' || square[1] === '1');
       if (isPromotion) {
         setPromotion({ from: selectedSquare, to: square, color: piece!.color });
         return;
@@ -121,6 +125,10 @@ export function GameScreen({ navigation, route }: Props) {
     makeMove(promotion.from, promotion.to, code);
     setPromotion(null);
   };
+
+  useEffect(() => {
+    setShowCheck(status === 'playing' && chess.inCheck());
+  }, [chess, fen, status]);
 
   const handleResign = () => {
     Alert.alert('Resign?', 'Are you sure you want to resign this match?', [
@@ -178,7 +186,7 @@ export function GameScreen({ navigation, route }: Props) {
           </View>
         </View>
 
-        <Pressable style={styles.navIconButton} onPress={() => navigation.navigate('Settings')}>
+        <Pressable style={styles.navIconButton} onPress={() => setShowMenu(true)}>
           <MoreHorizontal size={18} color={colors.textPrimary} />
         </Pressable>
       </View>
@@ -243,21 +251,28 @@ export function GameScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
 
-      <Modal visible={!!promotion} transparent animationType="fade" onRequestClose={() => setPromotion(null)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Promote pawn to</Text>
-            <View style={styles.promotionRow}>
-              {PROMOTION_PIECES.map((p) => (
-                <Pressable key={p.code} style={styles.promotionOption} onPress={() => handlePromotionPick(p.code)}>
-                  <Text style={styles.promotionGlyph}>{promotion?.color === 'w' ? p.white : p.black}</Text>
-                  <Text style={styles.promotionLabel}>{p.label}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <PromotionModal visible={!!promotion} color={promotion?.color ?? 'w'} onSelect={handlePromotionPick} onCancel={() => setPromotion(null)} />
+      <GameMenuSheet
+        visible={showMenu}
+        onResume={() => setShowMenu(false)}
+        onOfferDraw={() => {
+          setShowMenu(false);
+          offerDraw();
+        }}
+        onUndo={() => {
+          setShowMenu(false);
+          handleUndo();
+        }}
+        onResign={() => {
+          setShowMenu(false);
+          resignGame(turn);
+        }}
+        onQuitHome={() => {
+          setShowMenu(false);
+          navigation.popToTop();
+        }}
+      />
+      <CheckAlert visible={showCheck} onDismiss={() => setShowCheck(false)} />
     </View>
   );
 }
@@ -357,48 +372,5 @@ const styles = StyleSheet.create({
   actionLabelResign: {
     color: colors.accent,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  modalCard: {
-    width: '100%',
-    borderRadius: 18,
-    backgroundColor: colors.bg,
-    borderColor: colors.surfaceBorder,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 20,
-  },
-  modalTitle: {
-    fontFamily: fonts.bodySemiBold,
-    fontSize: 14,
-    color: colors.textPrimary,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  promotionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  promotionOption: {
-    alignItems: 'center',
-    gap: 6,
-    padding: 8,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceGlass,
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  promotionGlyph: {
-    fontSize: 28,
-    color: colors.textPrimary,
-  },
-  promotionLabel: {
-    fontFamily: fonts.body,
-    fontSize: 9,
-    color: colors.textSecondary,
-  },
+  // modal styles replaced by dedicated components
 });
