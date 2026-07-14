@@ -1,3 +1,6 @@
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+
 export type RootStackParamList = {
   Splash: undefined;
   Game: {
@@ -19,3 +22,11 @@ export type RootStackParamList = {
   GameHistory: undefined;
   Settings: undefined;
 };
+
+export type SplashNavProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
+export type GameNavProp = NativeStackNavigationProp<RootStackParamList, 'Game'>;
+export type GameRouteProp = RouteProp<RootStackParamList, 'Game'>;
+export type ResultNavProp = NativeStackNavigationProp<RootStackParamList, 'Result'>;
+export type ResultRouteProp = RouteProp<RootStackParamList, 'Result'>;
+export type GameHistoryNavProp = NativeStackNavigationProp<RootStackParamList, 'GameHistory'>;
+export type SettingsNavProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
