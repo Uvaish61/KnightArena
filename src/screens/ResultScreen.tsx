@@ -140,7 +140,18 @@ export function ResultScreen({ navigation, route }: Props) {
 
       <View style={styles.flexSpacer} />
 
-      <PrimaryButton label="Play Again" onPress={() => navigation.replace('GameSetup')} style={styles.primaryButton} />
+      <PrimaryButton
+        label="Play Again"
+        onPress={() =>
+          navigation.replace('Game', {
+            mode: 'pvp',
+            player1: 'White',
+            player2: 'Black',
+            timer: null,
+          })
+        }
+        style={styles.primaryButton}
+      />
 
       <View style={styles.secondaryRow}>
         <Pressable style={styles.secondaryButton} onPress={() => navigation.navigate('GameHistory')}>
