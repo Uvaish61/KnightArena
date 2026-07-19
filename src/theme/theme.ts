@@ -1,13 +1,15 @@
 export const colors = {
-  background: '#07111F',
-  backgroundSoft: '#0B1728',
-  surface: '#101B2F',
-  surfaceElevated: '#162238',
-  surfacePressed: '#1D2A42',
+  // Base surfaces retuned to the premium red/black system (were legacy teal).
+  // Kept under the same names so existing screens/components align automatically.
+  background: '#0a0808',
+  backgroundSoft: '#140f0f',
+  surface: 'rgba(255,255,255,0.04)',
+  surfaceElevated: 'rgba(255,255,255,0.08)',
+  surfacePressed: 'rgba(255,255,255,0.12)',
   border: 'rgba(255, 255, 255, 0.08)',
-  text: '#F4F7FB',
-  textMuted: 'rgba(244, 247, 251, 0.72)',
-  textSoft: 'rgba(244, 247, 251, 0.52)',
+  text: '#ffffff',
+  textMuted: 'rgba(255, 255, 255, 0.6)',
+  textSoft: 'rgba(255, 255, 255, 0.4)',
   primary: '#D8B45A',
   primaryDark: '#A8822A',
   accent: '#e84040',
