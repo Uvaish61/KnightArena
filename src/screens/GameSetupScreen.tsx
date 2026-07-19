@@ -1,268 +1,228 @@
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Swords, User, Users } from 'lucide-react-native';
+import { ArrowLeft, Clock3, Swords } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '../components/PrimaryButton';
-import { Surface } from '../components/Surface';
+import { useSettingsStore } from '../store/settingsStore';
 import type { RootStackParamList } from '../navigation/types';
-import { colors, radii, spacing } from '../theme/theme';
+import { colors, fonts, radii, spacing } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GameSetup'>;
-
 type Mode = 'pvp' | 'ai';
-type Difficulty = 'easy' | 'medium' | 'hard';
-
-const TIMER_OPTIONS: Array<{ label: string; minutes: number | null }> = [
-  { label: 'No Timer', minutes: null },
-  { label: '3 min', minutes: 3 },
-  { label: '5 min', minutes: 5 },
-  { label: '10 min', minutes: 10 },
-  { label: '15 min', minutes: 15 },
-];
-
-const DIFFICULTY_OPTIONS: Array<{ label: string; value: Difficulty }> = [
-  { label: 'Easy', value: 'easy' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Hard', value: 'hard' },
-];
 
 export function GameSetupScreen({ navigation }: Props) {
-  const [mode, setMode] = useState<Mode>('pvp');
-  const [player1, setPlayer1] = useState('');
-  const [player2, setPlayer2] = useState('');
-  const [timerMinutes, setTimerMinutes] = useState<number | null>(5);
-  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+    const insets = useSafeAreaInsets();
+    const { defaultTimer, aiDifficulty } = useSettingsStore();
+    const [mode, setMode] = useState<Mode>('pvp');
+    const [player1, setPlayer1] = useState('White');
+    const [player2, setPlayer2] = useState('Black');
+    const [timer, setTimer] = useState<number | null>(defaultTimer);
+    const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>(aiDifficulty);
 
-  const resolvedPlayer1 = useMemo(() => player1.trim() || 'Player 1', [player1]);
-  const resolvedPlayer2 = useMemo(() => {
-    if (mode === 'ai') return `AI (${difficulty})`;
-    return player2.trim() || 'Player 2';
-  }, [mode, player2, difficulty]);
+    const timerOptions = useMemo(() => ([null, 5, 10, 15] as Array<number | null>), []);
 
-  const handleStart = () => {
-    navigation.navigate('Game', {
-      mode,
-      player1: resolvedPlayer1,
-      player2: resolvedPlayer2,
-      timer: timerMinutes,
-      aiDifficulty: mode === 'ai' ? difficulty : undefined,
-    });
-  };
+    const handleStart = () => {
+        const p1 = player1.trim() || 'White';
+        const p2 = player2.trim() || (mode === 'ai' ? 'Knight AI' : 'Black');
 
-  return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Surface style={styles.card}>
-          <Text style={styles.title}>Game Setup</Text>
-          <Text style={styles.copy}>Choose how you want to play, then start the match.</Text>
+        navigation.navigate('Game', {
+            mode,
+            player1: p1,
+            player2: p2,
+            timer,
+            aiDifficulty: mode === 'ai' ? difficulty : undefined,
+        });
+    };
 
-          <Text style={styles.sectionLabel}>Mode</Text>
-          <View style={styles.modeRow}>
-            <Pressable
-              style={[styles.modeOption, mode === 'pvp' && styles.modeOptionActive]}
-              onPress={() => setMode('pvp')}
-            >
-              <Users size={18} color={mode === 'pvp' ? colors.background : colors.textMuted} />
-              <Text style={[styles.modeOptionLabel, mode === 'pvp' && styles.modeOptionLabelActive]}>
-                Player vs Player
-              </Text>
+    return (
+        <KeyboardAvoidingView style={[styles.container, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.md }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+                <ArrowLeft size={18} color={colors.textPrimary} />
             </Pressable>
-            <Pressable
-              style={[styles.modeOption, mode === 'ai' && styles.modeOptionActive]}
-              onPress={() => setMode('ai')}
-            >
-              <Swords size={18} color={mode === 'ai' ? colors.background : colors.textMuted} />
-              <Text style={[styles.modeOptionLabel, mode === 'ai' && styles.modeOptionLabelActive]}>
-                Player vs AI
-              </Text>
-            </Pressable>
-          </View>
 
-          <Text style={styles.sectionLabel}>Players</Text>
-          <View style={styles.inputRow}>
-            <User size={16} color={colors.textSoft} />
-            <TextInput
-              style={styles.input}
-              value={player1}
-              onChangeText={setPlayer1}
-              placeholder="Player 1"
-              placeholderTextColor={colors.textSoft}
-              maxLength={20}
-            />
-          </View>
-          {mode === 'pvp' && (
-            <View style={styles.inputRow}>
-              <User size={16} color={colors.textSoft} />
-              <TextInput
-                style={styles.input}
-                value={player2}
-                onChangeText={setPlayer2}
-                placeholder="Player 2"
-                placeholderTextColor={colors.textSoft}
-                maxLength={20}
-              />
+            <View style={styles.card}>
+                <Text style={styles.title}>Game Setup</Text>
+                <Text style={styles.copy}>Set the players, mode, and timer before starting the match.</Text>
+
+                <View style={styles.segmentRow}>
+                    <Pressable style={[styles.segment, mode === 'pvp' && styles.segmentActive]} onPress={() => setMode('pvp')}>
+                        <Swords size={16} color={mode === 'pvp' ? colors.textPrimary : colors.textMuted} />
+                        <Text style={[styles.segmentLabel, mode === 'pvp' && styles.segmentLabelActive]}>PvP</Text>
+                    </Pressable>
+                    <Pressable style={[styles.segment, mode === 'ai' && styles.segmentActive]} onPress={() => setMode('ai')}>
+                        <Swords size={16} color={mode === 'ai' ? colors.textPrimary : colors.textMuted} />
+                        <Text style={[styles.segmentLabel, mode === 'ai' && styles.segmentLabelActive]}>vs AI</Text>
+                    </Pressable>
+                </View>
+
+                <View style={styles.fieldBlock}>
+                    <Text style={styles.fieldLabel}>Player 1</Text>
+                    <TextInput value={player1} onChangeText={setPlayer1} placeholder="White" placeholderTextColor={colors.textMuted} style={styles.input} />
+                </View>
+                <View style={styles.fieldBlock}>
+                    <Text style={styles.fieldLabel}>{mode === 'ai' ? 'Human Player' : 'Player 2'}</Text>
+                    <TextInput value={player2} onChangeText={setPlayer2} placeholder={mode === 'ai' ? 'You' : 'Black'} placeholderTextColor={colors.textMuted} style={styles.input} />
+                </View>
+
+                <View style={styles.fieldBlock}>
+                    <View style={styles.labelRow}>
+                        <Clock3 size={16} color={colors.textMuted} />
+                        <Text style={styles.fieldLabel}>Timer</Text>
+                    </View>
+                    <View style={styles.pillRow}>
+                        {timerOptions.map((option) => {
+                            const active = timer === option;
+                            const label = option === null ? 'None' : `${option} min`;
+                            return (
+                                <Pressable key={String(option)} onPress={() => setTimer(option)} style={[styles.pill, active && styles.pillActive]}>
+                                    <Text style={[styles.pillText, active && styles.pillTextActive]}>{label}</Text>
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+                </View>
+
+                {mode === 'ai' ? (
+                    <View style={styles.fieldBlock}>
+                        <Text style={styles.fieldLabel}>AI Difficulty</Text>
+                        <View style={styles.pillRow}>
+                            {(['easy', 'medium', 'hard'] as const).map((item) => {
+                                const active = difficulty === item;
+                                return (
+                                    <Pressable key={item} onPress={() => setDifficulty(item)} style={[styles.pill, active && styles.pillActive]}>
+                                        <Text style={[styles.pillText, active && styles.pillTextActive]}>{item.toUpperCase()}</Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    </View>
+                ) : null}
+
+                <PrimaryButton label="Start Match" onPress={handleStart} style={styles.startButton} />
             </View>
-          )}
-
-          {mode === 'ai' && (
-            <>
-              <Text style={styles.sectionLabel}>AI Difficulty</Text>
-              <View style={styles.chipRow}>
-                {DIFFICULTY_OPTIONS.map((opt) => (
-                  <Pressable
-                    key={opt.value}
-                    style={[styles.chip, difficulty === opt.value && styles.chipActive]}
-                    onPress={() => setDifficulty(opt.value)}
-                  >
-                    <Text style={[styles.chipLabel, difficulty === opt.value && styles.chipLabelActive]}>
-                      {opt.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </>
-          )}
-
-          <Text style={styles.sectionLabel}>Timer</Text>
-          <View style={styles.chipRow}>
-            {TIMER_OPTIONS.map((opt) => (
-              <Pressable
-                key={opt.label}
-                style={[styles.chip, timerMinutes === opt.minutes && styles.chipActive]}
-                onPress={() => setTimerMinutes(opt.minutes)}
-              >
-                <Text style={[styles.chipLabel, timerMinutes === opt.minutes && styles.chipLabelActive]}>
-                  {opt.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-
-          <PrimaryButton label="Start Game" onPress={handleStart} style={styles.button} />
-          <PrimaryButton
-            label="Back to Home"
-            variant="secondary"
-            onPress={() => navigation.popToTop()}
-            style={styles.secondaryButton}
-          />
-        </Surface>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+        </KeyboardAvoidingView>
+    );
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flexGrow: 1,
-    padding: spacing.lg,
-    justifyContent: 'center',
-  },
-  card: {
-    paddingVertical: spacing.xl,
-  },
-  title: {
-    color: colors.text,
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  copy: {
-    marginTop: spacing.sm,
-    color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  sectionLabel: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.xs,
-    color: colors.textSoft,
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  modeRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  modeOption: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: radii.md,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  modeOptionActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  modeOptionLabel: {
-    color: colors.textMuted,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  modeOptionLabelActive: {
-    color: colors.background,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    borderRadius: radii.md,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-    marginBottom: 10,
-  },
-  input: {
-    flex: 1,
-    color: colors.text,
-    fontSize: 14,
-    paddingVertical: 12,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: radii.pill,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderColor: colors.border,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipLabel: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  chipLabelActive: {
-    color: colors.background,
-  },
-  button: {
-    marginTop: spacing.xl,
-  },
-  secondaryButton: {
-    marginTop: spacing.sm,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: colors.bg,
+        paddingHorizontal: spacing.md,
+    },
+    backButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.surface,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.surfaceBorder,
+    },
+    card: {
+        marginTop: spacing.md,
+        padding: spacing.lg,
+        borderRadius: radii.xl,
+        backgroundColor: colors.surface,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.surfaceBorder,
+    },
+    title: {
+        color: colors.textPrimary,
+        fontFamily: fonts.heading,
+        fontSize: 28,
+    },
+    copy: {
+        marginTop: 8,
+        color: colors.textSecondary,
+        fontSize: 14,
+        lineHeight: 22,
+    },
+    segmentRow: {
+        flexDirection: 'row',
+        gap: 10,
+        marginTop: spacing.lg,
+    },
+    segment: {
+        flex: 1,
+        minHeight: 52,
+        borderRadius: radii.full,
+        backgroundColor: colors.bg,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.surfaceBorder,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    segmentActive: {
+        backgroundColor: colors.accentMuted,
+        borderColor: colors.accentBorder,
+    },
+    segmentLabel: {
+        color: colors.textMuted,
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    segmentLabelActive: {
+        color: colors.textPrimary,
+    },
+    fieldBlock: {
+        marginTop: spacing.lg,
+    },
+    labelRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
+    },
+    fieldLabel: {
+        color: colors.textPrimary,
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    input: {
+        minHeight: 54,
+        borderRadius: radii.full,
+        paddingHorizontal: 16,
+        backgroundColor: colors.bg,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.surfaceBorder,
+        color: colors.textPrimary,
+        fontSize: 14,
+        fontFamily: fonts.body,
+    },
+    pillRow: {
+        flexDirection: 'row',
+        gap: 8,
+        flexWrap: 'wrap',
+    },
+    pill: {
+        minHeight: 38,
+        borderRadius: radii.full,
+        paddingHorizontal: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.bg,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.surfaceBorder,
+    },
+    pillActive: {
+        backgroundColor: colors.accent,
+        borderColor: colors.accentBorder,
+    },
+    pillText: {
+        color: colors.textSecondary,
+        fontSize: 12,
+        fontWeight: '700',
+    },
+    pillTextActive: {
+        color: colors.textPrimary,
+    },
+    startButton: {
+        marginTop: spacing.xl,
+    },
 });

@@ -15,7 +15,7 @@ export const colors = {
   danger: '#F56C6C',
   warning: '#E6B85C',
 
-  // Redesign tokens (premium red/black chess theme) — used by Splash/Home/GameSetup onward
+  // Redesign tokens (premium red/black chess theme) — used by Splash and the in-game flow
   bg: '#0a0808',
   bgHero: '#1a0808',
   surfaceBorder: 'rgba(255,255,255,0.07)',
