@@ -135,13 +135,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textPrimary,
   },
-  name: {
+  info: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  name: {
     fontFamily: fonts.bodySemiBold,
     fontSize: 13,
   },
   nameActive: {
     color: colors.textPrimary,
+  },
+  capturedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    gap: 6,
+  },
+  capturedGlyphs: {
+    flexShrink: 1,
+    fontSize: 13,
+    lineHeight: 15,
+    color: colors.textSecondary,
+  },
+  advantage: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 11,
+    color: colors.success,
   },
   nameInactive: {
     color: colors.textSecondary,

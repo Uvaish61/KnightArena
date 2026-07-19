@@ -192,6 +192,13 @@ export function GameScreen({ navigation, route }: Props) {
     return pairs;
   }, [moveHistory]);
 
+  const { whiteAdvantage, blackAdvantage } = useMemo(() => {
+    const values: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+    const sum = (pieces: string[]) => pieces.reduce((total, p) => total + (values[p] ?? 0), 0);
+    const diff = sum(capturedByWhite) - sum(capturedByBlack);
+    return { whiteAdvantage: Math.max(0, diff), blackAdvantage: Math.max(0, -diff) };
+  }, [capturedByWhite, capturedByBlack]);
+
   const flipped = mode === 'pvp' && turn === 'b';
 
   return (
