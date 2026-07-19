@@ -63,6 +63,7 @@ export const radii = {
   lg: 28,
   xl: 36,
   pill: 999,
+  full: 999,
 };
 
 export const shadows = {
