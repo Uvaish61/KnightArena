@@ -8,12 +8,9 @@ export function useChessTimer(enabled: boolean) {
   const tickTimer = useGameStore((s) => s.tickTimer);
 
   useEffect(() => {
-    lastTick.current = Date.now();
-  }, [turn]);
-
-  useEffect(() => {
     if (!enabled || status !== 'playing') return undefined;
 
+    lastTick.current = Date.now();
     const interval = setInterval(() => {
       const now = Date.now();
       const delta = now - lastTick.current;
