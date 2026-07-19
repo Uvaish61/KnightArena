@@ -56,6 +56,11 @@ export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer, cap
     };
   }, [isActive, ringWidth, timerScale]);
 
+  const capturedColor = piece === 'w' ? 'b' : 'w';
+  const sortedCaptured = [...captured].sort(
+    (a, b) => (CAPTURE_ORDER[a] ?? 9) - (CAPTURE_ORDER[b] ?? 9),
+  );
+
   return (
     <View style={styles.row}>
       <Animated.View
@@ -72,9 +77,19 @@ export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer, cap
         )}
       </Animated.View>
 
-      <Text style={[styles.name, isActive ? styles.nameActive : styles.nameInactive]} numberOfLines={1}>
-        {name}
-      </Text>
+      <View style={styles.info}>
+        <Text style={[styles.name, isActive ? styles.nameActive : styles.nameInactive]} numberOfLines={1}>
+          {name}
+        </Text>
+        {(sortedCaptured.length > 0 || advantage > 0) && (
+          <View style={styles.capturedRow}>
+            <Text style={styles.capturedGlyphs} numberOfLines={1}>
+              {sortedCaptured.map((c) => CAPTURED_GLYPHS[capturedColor][c] ?? '').join('')}
+            </Text>
+            {advantage > 0 && <Text style={styles.advantage}>+{advantage}</Text>}
+          </View>
+        )}
+      </View>
 
       {hasTimer && (
         <Animated.View
