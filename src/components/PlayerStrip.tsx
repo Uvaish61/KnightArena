@@ -12,9 +12,18 @@ type PlayerStripProps = {
   isActive: boolean;
   isAI?: boolean;
   hasTimer: boolean;
+  captured?: string[];
+  advantage?: number;
 };
 
-export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer }: PlayerStripProps) {
+const CAPTURED_GLYPHS: Record<'w' | 'b', Record<string, string>> = {
+  w: { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕' },
+  b: { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛' },
+};
+
+const CAPTURE_ORDER: Record<string, number> = { q: 0, r: 1, b: 2, n: 3, p: 4 };
+
+export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer, captured = [], advantage = 0 }: PlayerStripProps) {
   const ringWidth = useRef(new Animated.Value(1.5)).current;
   const timerScale = useRef(new Animated.Value(1)).current;
 
