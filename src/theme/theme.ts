@@ -18,6 +18,7 @@ export const colors = {
   // Redesign tokens (premium red/black chess theme) — used by Splash and the in-game flow
   bg: '#0a0808',
   bgHero: '#1a0808',
+  modalBg: '#140f0f',
   surfaceBorder: 'rgba(255,255,255,0.07)',
   accentGlow: 'rgba(232,64,64,0.35)',
   accentMuted: 'rgba(232,64,64,0.15)',
