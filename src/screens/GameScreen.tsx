@@ -227,6 +227,8 @@ export function GameScreen({ navigation, route }: Props) {
         isActive={turn === 'b' && status === 'playing'}
         isAI={mode === 'ai'}
         hasTimer={!!timer}
+        captured={capturedByBlack}
+        advantage={blackAdvantage}
       />
 
       <View style={styles.boardWrap}>
@@ -259,6 +261,8 @@ export function GameScreen({ navigation, route }: Props) {
         timeMs={whiteTimeMs}
         isActive={turn === 'w' && status === 'playing'}
         hasTimer={!!timer}
+        captured={capturedByWhite}
+        advantage={whiteAdvantage}
       />
 
       <View style={styles.actionBar}>
