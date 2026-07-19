@@ -9,6 +9,7 @@ import { PlayerStrip } from '../components/PlayerStrip';
 import { PromotionModal } from '../components/modals/PromotionModal';
 import { GameMenuSheet } from '../components/modals/GameMenuSheet';
 import { CheckAlert } from '../components/game/CheckAlert';
+import { pickAIMove } from '../ai/chessAI';
 import { useChessTimer } from '../hooks/useChessTimer';
 import { useGameStore } from '../store/gameStore';
 import type { RootStackParamList } from '../navigation/types';
@@ -108,6 +109,7 @@ export function GameScreen({ navigation, route }: Props) {
 
   const handleSquarePress = (square: string) => {
     if (status !== 'playing') return;
+    if (mode === 'ai' && turn === 'b') return;
 
     if (selectedSquare && possibleMoves.includes(square)) {
       const piece = chess.get(selectedSquare as any);
@@ -129,6 +131,17 @@ export function GameScreen({ navigation, route }: Props) {
   useEffect(() => {
     setShowCheck(status === 'playing' && chess.inCheck());
   }, [chess, fen, status]);
+
+  useEffect(() => {
+    if (mode !== 'ai' || status !== 'playing' || turn !== 'b') return undefined;
+
+    const timeout = setTimeout(() => {
+      const move = pickAIMove(fen, aiDifficulty ?? 'medium');
+      if (move) makeMove(move.from, move.to, move.promotion);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [mode, status, turn, fen, aiDifficulty, makeMove]);
 
   const handleResign = () => {
     Alert.alert('Resign?', 'Are you sure you want to resign this match?', [
