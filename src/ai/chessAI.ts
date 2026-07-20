@@ -12,6 +12,23 @@ const SEARCH_DEPTH: Record<AIDifficulty, number> = { easy: 0, medium: 1, hard: 3
 // material gains. Kept finite so alpha-beta comparisons stay well-behaved.
 const MATE_SCORE = 1_000_000;
 
+// Search captures (and promotions) first so alpha-beta prunes more branches.
+// MVV-LVA: prefer capturing a high-value victim with a low-value attacker.
+function moveHeuristic(move: Move): number {
+  let score = 0;
+  if (move.captured) {
+    score += 10 * (PIECE_VALUES[move.captured] ?? 0) - (PIECE_VALUES[move.piece] ?? 0);
+  }
+  if (move.promotion) {
+    score += PIECE_VALUES[move.promotion] ?? 0;
+  }
+  return score;
+}
+
+function orderMoves(moves: Move[]): Move[] {
+  return [...moves].sort((a, b) => moveHeuristic(b) - moveHeuristic(a));
+}
+
 function evaluateBoard(chess: Chess): number {
   let score = 0;
   for (const row of chess.board()) {
@@ -40,7 +57,7 @@ function negamax(chess: Chess, depth: number, alpha: number, beta: number): numb
   }
 
   let best = -Infinity;
-  const moves = chess.moves({ verbose: true }) as Move[];
+  const moves = orderMoves(chess.moves({ verbose: true }) as Move[]);
   for (const move of moves) {
     chess.move({ from: move.from, to: move.to, promotion: move.promotion ?? 'q' });
     const score = -negamax(chess, depth - 1, -beta, -alpha);
