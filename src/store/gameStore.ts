@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { Chess } from 'chess.js';
 
+import { playSound } from '../audio/sounds';
+
 type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
 type Winner = 'w' | 'b' | 'draw' | null;
 
@@ -76,6 +78,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const piece = chess.get(square as any);
     if (piece && piece.color === chess.turn()) {
       const moves = chess.moves({ square: square as any, verbose: true });
+      playSound('select');
       set({ selectedSquare: square, possibleMoves: moves.map((m: any) => m.to) });
     } else {
       set({ selectedSquare: null, possibleMoves: [] });

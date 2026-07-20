@@ -6,9 +6,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { preloadSounds } from './src/audio/sounds';
 import { colors } from './src/theme/theme';
 
 enableScreens();
+preloadSounds();
 
 const navigationTheme = {
   dark: true,
