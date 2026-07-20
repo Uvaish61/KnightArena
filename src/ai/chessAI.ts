@@ -97,15 +97,44 @@ const PIECE_SQUARE_TABLES: Record<string, number[]> = {
   ],
 };
 
+// In the endgame the king should be active and centralized, not tucked away.
+const KING_ENDGAME_TABLE: number[] = [
+  -50,-40,-30,-20,-20,-30,-40,-50,
+  -30,-20,-10,  0,  0,-10,-20,-30,
+  -30,-10, 20, 30, 30, 20,-10,-30,
+  -30,-10, 30, 40, 40, 30,-10,-30,
+  -30,-10, 30, 40, 40, 30,-10,-30,
+  -30,-10, 20, 30, 30, 20,-10,-30,
+  -30,-30,  0,  0,  0,  0,-30,-30,
+  -50,-30,-30,-30,-30,-30,-30,-50,
+];
+
+// Below this total non-pawn material (both sides) we treat it as an endgame and
+// switch the king to the centralizing table.
+const ENDGAME_MATERIAL_THRESHOLD = 1500;
+
 function evaluateBoard(chess: Chess): number {
-  let score = 0;
   const board = chess.board();
+
+  // Determine game phase first so the king uses the right table.
+  let nonPawnMaterial = 0;
+  for (const row of board) {
+    for (const cell of row) {
+      if (cell && cell.type !== 'p' && cell.type !== 'k') {
+        nonPawnMaterial += PIECE_VALUES[cell.type] ?? 0;
+      }
+    }
+  }
+  const endgame = nonPawnMaterial <= ENDGAME_MATERIAL_THRESHOLD;
+
+  let score = 0;
   for (let r = 0; r < 8; r += 1) {
     for (let c = 0; c < 8; c += 1) {
       const cell = board[r][c];
       if (!cell) continue;
       const material = PIECE_VALUES[cell.type] ?? 0;
-      const table = PIECE_SQUARE_TABLES[cell.type];
+      const table =
+        cell.type === 'k' && endgame ? KING_ENDGAME_TABLE : PIECE_SQUARE_TABLES[cell.type];
       // Mirror the table vertically for Black.
       const positional = table ? table[(cell.color === 'w' ? r : 7 - r) * 8 + c] : 0;
       const total = material + positional;
