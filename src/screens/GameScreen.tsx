@@ -56,7 +56,9 @@ export function GameScreen({ navigation, route }: Props) {
   const [promotion, setPromotion] = useState<{ from: string; to: string; color: 'w' | 'b' } | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
+  const [hintMove, setHintMove] = useState<{ from: string; to: string } | null>(null);
   const matchStartedAt = useRef(Date.now());
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useChessTimer(!!timer && status === 'playing');
 
@@ -153,6 +155,27 @@ export function GameScreen({ navigation, route }: Props) {
     ]);
   };
 
+  const handleHint = () => {
+    if (status !== 'playing') return;
+    if (mode === 'ai' && turn === 'b') return;
+
+    const move = pickAIMove(fen, 'hard');
+    if (!move) return;
+
+    setHintMove({ from: move.from, to: move.to });
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+    hintTimer.current = setTimeout(() => setHintMove(null), 3000);
+  };
+
+  // Clear any active hint once the position changes (a move was made).
+  useEffect(() => {
+    setHintMove(null);
+  }, [fen]);
+
+  useEffect(() => () => {
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+  }, []);
+
   const handleUndo = () => {
     const undone = chess.undo();
     if (!undone) return;
@@ -241,6 +264,7 @@ export function GameScreen({ navigation, route }: Props) {
           selectedSquare={selectedSquare}
           possibleMoves={moveSuggestions ? possibleMoves : []}
           lastMove={lastMove}
+          hintMove={hintMove}
           onSquarePress={handleSquarePress}
           flipped={flipped}
         />
@@ -270,7 +294,7 @@ export function GameScreen({ navigation, route }: Props) {
       />
 
       <View style={styles.actionBar}>
-        <Pressable style={styles.actionButton} onPress={() => Alert.alert('Hint', 'Move suggestions are coming soon.')}>
+        <Pressable style={styles.actionButton} onPress={handleHint}>
           <Lightbulb size={18} color={colors.textSecondary} />
           <Text style={styles.actionLabel}>HINT</Text>
         </Pressable>

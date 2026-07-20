@@ -40,6 +40,8 @@ export const colors = {
   boardLastMoveDark: '#8a7a1e',
   boardSelectedLight: '#eede58',
   boardSelectedDark: '#a89a18',
+  boardHintLight: '#a7e8c4',
+  boardHintDark: '#2f8f5e',
 };
 
 export const fonts = {

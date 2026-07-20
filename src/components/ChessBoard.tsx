@@ -18,6 +18,7 @@ type ChessBoardProps = {
   selectedSquare: string | null;
   possibleMoves: string[];
   lastMove: { from: string; to: string } | null;
+  hintMove?: { from: string; to: string } | null;
   onSquarePress: (square: string) => void;
   flipped?: boolean;
 };
@@ -51,7 +52,7 @@ function parseBoardFromFen(fen: string): Array<Array<{ square: string; piece: st
   return board;
 }
 
-export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, onSquarePress, flipped }: ChessBoardProps) {
+export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, onSquarePress, flipped }: ChessBoardProps) {
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
 
@@ -67,6 +68,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, onSqu
 
   const getSquareBg = (light: boolean, square: string) => {
     if (square === selectedSquare) return light ? colors.boardSelectedLight : colors.boardSelectedDark;
+    if (square === hintMove?.from || square === hintMove?.to) return light ? colors.boardHintLight : colors.boardHintDark;
     if (square === lastMove?.from || square === lastMove?.to) return light ? colors.boardLastMoveLight : colors.boardLastMoveDark;
     return light ? colors.boardLight : colors.boardDark;
   };
