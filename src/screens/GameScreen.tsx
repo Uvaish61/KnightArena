@@ -155,6 +155,18 @@ export function GameScreen({ navigation, route }: Props) {
     ]);
   };
 
+  const handleOfferDraw = () => {
+    if (mode === 'ai') {
+      if (shouldAIAcceptDraw(fen)) {
+        offerDraw();
+      } else {
+        Alert.alert('Draw declined', 'The AI declined your draw offer and plays on.');
+      }
+      return;
+    }
+    offerDraw();
+  };
+
   const handleHint = () => {
     if (status !== 'playing') return;
     if (mode === 'ai' && turn === 'b') return;
@@ -302,7 +314,7 @@ export function GameScreen({ navigation, route }: Props) {
           <RotateCcw size={18} color={colors.textSecondary} />
           <Text style={styles.actionLabel}>UNDO</Text>
         </Pressable>
-        <Pressable style={styles.actionButton} onPress={offerDraw}>
+        <Pressable style={styles.actionButton} onPress={handleOfferDraw}>
           <Handshake size={18} color={colors.textSecondary} />
           <Text style={styles.actionLabel}>DRAW</Text>
         </Pressable>
