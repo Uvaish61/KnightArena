@@ -12,10 +12,30 @@ import { colors, fonts, radii, shadows, spacing } from '../theme/theme';
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 const outcomeConfig = {
-  w: { label: 'Victory!', sub: 'White wins by checkmate', emoji: '♙' },
-  b: { label: 'Victory!', sub: 'Black wins by checkmate', emoji: '♟' },
-  draw: { label: 'Draw', sub: 'Game ended in a draw', emoji: '⚖️' },
+  w: { label: 'Victory!', emoji: '♙' },
+  b: { label: 'Victory!', emoji: '♟' },
+  draw: { label: 'Draw', emoji: '⚖️' },
 } as const;
+
+type EndReason = 'checkmate' | 'resignation' | 'timeout' | 'stalemate' | 'draw' | null | undefined;
+
+function outcomeSubtitle(winner: 'w' | 'b' | 'draw', reason: EndReason) {
+  if (winner === 'draw') {
+    return reason === 'stalemate' ? 'Draw by stalemate' : 'Game ended in a draw';
+  }
+
+  const side = winner === 'w' ? 'White' : 'Black';
+  switch (reason) {
+    case 'resignation':
+      return `${side} wins by resignation`;
+    case 'timeout':
+      return `${side} wins on time`;
+    case 'checkmate':
+      return `${side} wins by checkmate`;
+    default:
+      return `${side} wins`;
+  }
+}
 
 function formatDuration(durationMs: number) {
   const safeMs = Math.max(0, durationMs);
@@ -47,9 +67,10 @@ export function ResultScreen({ navigation, route }: Props) {
   const ringScale = useRef(new Animated.Value(0.6)).current;
   const knightY = useRef(new Animated.Value(-30)).current;
   const knightOpacity = useRef(new Animated.Value(0)).current;
-  const { winner, player1, player2, moveCount, durationMs, pgn, captureCount } = route.params;
+  const { winner, reason, player1, player2, moveCount, durationMs, pgn, captureCount } = route.params;
   const normalizedWinner = winner ?? 'draw';
   const outcome = outcomeConfig[normalizedWinner];
+  const subtitle = outcomeSubtitle(normalizedWinner, reason);
 
   useEffect(() => {
     if (savedRef.current) {
@@ -119,7 +140,7 @@ export function ResultScreen({ navigation, route }: Props) {
 
       <View style={styles.centerBlock}>
         <Text style={styles.title}>{outcome.label}</Text>
-        <Text style={styles.subtitle}>{outcome.sub}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
       <View style={styles.playerRow}>
