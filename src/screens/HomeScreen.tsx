@@ -56,7 +56,10 @@ export function HomeScreen({ navigation }: Props) {
                 {latestMatch ? (
                     <>
                         <Text style={styles.resultTitle}>{latestMatch.player1} vs {latestMatch.player2}</Text>
-                        <Text style={styles.resultCopy}>{latestMatch.winner === 'draw' ? 'Draw' : latestMatch.winner === 'w' ? `${latestMatch.player1} won` : `${latestMatch.player2} won`} · {latestMatch.moveCount} moves</Text>
+                        <Text style={styles.resultCopy}>
+                            {latestMatch.winner === 'draw' ? 'Draw' : latestMatch.winner === 'w' ? `${latestMatch.player1} won` : `${latestMatch.player2} won`} · {latestMatch.moveCount} moves
+                            {latestMatch.mode === 'ai' ? ' · vs AI' : latestMatch.mode === 'pvp' ? ' · PvP' : ''}
+                        </Text>
                     </>
                 ) : (
                     <>
