@@ -96,6 +96,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (move.captured) {
         if (move.color === 'w') nextCapturedByWhite.push(move.captured);
         else nextCapturedByBlack.push(move.captured);
+        playSound('capture');
+      } else {
+        playSound('move');
       }
 
       set({
