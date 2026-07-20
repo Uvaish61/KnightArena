@@ -42,6 +42,7 @@ export function GameScreen({ navigation, route }: Props) {
   const moveHistory = useGameStore((s) => s.moveHistory);
   const status = useGameStore((s) => s.status);
   const winner = useGameStore((s) => s.winner);
+  const endReason = useGameStore((s) => s.endReason);
   const whiteTimeMs = useGameStore((s) => s.whiteTimeMs);
   const blackTimeMs = useGameStore((s) => s.blackTimeMs);
 
@@ -71,6 +72,7 @@ export function GameScreen({ navigation, route }: Props) {
     if (status !== 'ended') return;
     navigation.replace('Result', {
       winner,
+      reason: endReason,
       player1,
       player2,
       moveCount: moveHistory.length,
@@ -79,7 +81,7 @@ export function GameScreen({ navigation, route }: Props) {
       captureCount: capturedByWhite.length + capturedByBlack.length,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [capturedByBlack.length, capturedByWhite.length, chess, moveHistory.length, navigation, player1, player2, status, winner]);
+  }, [capturedByBlack.length, capturedByWhite.length, chess, endReason, moveHistory.length, navigation, player1, player2, status, winner]);
 
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
