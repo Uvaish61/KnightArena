@@ -330,7 +330,7 @@ export function GameScreen({ navigation, route }: Props) {
         onResume={() => setShowMenu(false)}
         onOfferDraw={() => {
           setShowMenu(false);
-          offerDraw();
+          handleOfferDraw();
         }}
         onUndo={() => {
           setShowMenu(false);
