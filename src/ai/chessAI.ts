@@ -6,7 +6,9 @@ export type AIMove = { from: string; to: string; promotion: string };
 
 const PIECE_VALUES: Record<string, number> = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
 
-const SEARCH_DEPTH: Record<AIDifficulty, number> = { easy: 0, medium: 1, hard: 3 };
+// medium searches 2 plies so it sees the opponent's recapture and stops hanging
+// pieces (depth 1 only grabs immediate material). hard goes deeper for tactics.
+const SEARCH_DEPTH: Record<AIDifficulty, number> = { easy: 0, medium: 2, hard: 3 };
 
 // Well above any achievable material score, so a forced mate always outranks
 // material gains. Kept finite so alpha-beta comparisons stay well-behaved.
