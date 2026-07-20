@@ -100,18 +100,13 @@ export function ResultScreen({ navigation, route }: Props) {
     [normalizedWinner, player1, player2],
   );
 
-  const restartGame = () => {
-    navigation.replace('Game', {
-      mode: 'pvp',
-      player1: 'White',
-      player2: 'Black',
-      timer: null,
-    });
+  const goHome = () => {
+    navigation.navigate('Home');
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + spacing.sm, paddingBottom: insets.bottom + spacing.md }]}>
-      <Pressable style={styles.backButton} onPress={restartGame}>
+      <Pressable style={styles.backButton} onPress={goHome}>
         <ArrowLeft size={18} color={colors.textPrimary} />
       </Pressable>
 
@@ -160,9 +155,9 @@ export function ResultScreen({ navigation, route }: Props) {
           <History size={18} color={colors.textPrimary} />
           <Text style={styles.secondaryLabel}>View History</Text>
         </Pressable>
-        <Pressable style={styles.secondaryButton} onPress={restartGame}>
+        <Pressable style={styles.secondaryButton} onPress={goHome}>
           <RotateCcw size={18} color={colors.textPrimary} />
-          <Text style={styles.secondaryLabel}>Start</Text>
+          <Text style={styles.secondaryLabel}>Home</Text>
         </Pressable>
       </View>
     </View>

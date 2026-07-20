@@ -21,7 +21,7 @@ export function GameSetupScreen({ navigation }: Props) {
     const [timer, setTimer] = useState<number | null>(defaultTimer);
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>(aiDifficulty);
 
-    const timerOptions = useMemo(() => ([null, 5, 10, 15] as Array<number | null>), []);
+    const timerOptions = useMemo(() => ([null, 3, 5, 10] as Array<number | null>), []);
 
     const handleStart = () => {
         const p1 = player1.trim() || 'White';

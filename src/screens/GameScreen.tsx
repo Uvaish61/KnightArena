@@ -12,6 +12,7 @@ import { CheckAlert } from '../components/game/CheckAlert';
 import { pickAIMove } from '../ai/chessAI';
 import { useChessTimer } from '../hooks/useChessTimer';
 import { useGameStore } from '../store/gameStore';
+import { useSettingsStore } from '../store/settingsStore';
 import type { RootStackParamList } from '../navigation/types';
 import { colors, fonts } from '../theme/theme';
 
@@ -27,6 +28,8 @@ const PROMOTION_PIECES: Array<{ code: string; white: string; black: string; labe
 export function GameScreen({ navigation, route }: Props) {
   const { mode, player1, player2, timer, aiDifficulty } = route.params;
   const insets = useSafeAreaInsets();
+  const autoFlipBoard = useSettingsStore((s) => s.autoFlipBoard);
+  const moveSuggestions = useSettingsStore((s) => s.moveSuggestions);
 
   const chess = useGameStore((s) => s.chess);
   const fen = useGameStore((s) => s.fen);
@@ -154,6 +157,12 @@ export function GameScreen({ navigation, route }: Props) {
     const undone = chess.undo();
     if (!undone) return;
 
+    // In AI mode, also take back the human's move so it's the human's turn again;
+    // otherwise the AI would immediately replay its move.
+    if (mode === 'ai' && chess.turn() === 'b' && chess.history().length > 0) {
+      chess.undo();
+    }
+
     const verboseHistory = chess.history({ verbose: true }) as any[];
     const nextCapturedByWhite: string[] = [];
     const nextCapturedByBlack: string[] = [];
@@ -175,13 +184,8 @@ export function GameScreen({ navigation, route }: Props) {
     });
   };
 
-  const restartGame = () => {
-    navigation.replace('Game', {
-      mode: 'pvp',
-      player1: 'White',
-      player2: 'Black',
-      timer: null,
-    });
+  const quitToHome = () => {
+    navigation.navigate('Home');
   };
 
   const movePairs = useMemo(() => {
@@ -199,7 +203,7 @@ export function GameScreen({ navigation, route }: Props) {
     return { whiteAdvantage: Math.max(0, diff), blackAdvantage: Math.max(0, -diff) };
   }, [capturedByWhite, capturedByBlack]);
 
-  const flipped = mode === 'pvp' && turn === 'b';
+  const flipped = mode === 'pvp' && autoFlipBoard && turn === 'b';
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
@@ -235,7 +239,7 @@ export function GameScreen({ navigation, route }: Props) {
         <ChessBoard
           fen={fen}
           selectedSquare={selectedSquare}
-          possibleMoves={possibleMoves}
+          possibleMoves={moveSuggestions ? possibleMoves : []}
           lastMove={lastMove}
           onSquarePress={handleSquarePress}
           flipped={flipped}
@@ -302,7 +306,7 @@ export function GameScreen({ navigation, route }: Props) {
         }}
         onQuitHome={() => {
           setShowMenu(false);
-          restartGame();
+          quitToHome();
         }}
       />
       <CheckAlert visible={showCheck} onDismiss={() => setShowCheck(false)} />
