@@ -5,6 +5,7 @@ import { playSound } from '../audio/sounds';
 
 type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
 type Winner = 'w' | 'b' | 'draw' | null;
+type EndReason = 'checkmate' | 'resignation' | 'timeout' | 'stalemate' | 'draw' | null;
 
 interface GameStore {
   chess: Chess;
@@ -18,6 +19,7 @@ interface GameStore {
   moveHistory: string[];
   status: GameStatus;
   winner: Winner;
+  endReason: EndReason;
   whiteTimeMs: number;
   blackTimeMs: number;
 
@@ -46,6 +48,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   moveHistory: [],
   status: 'idle',
   winner: null,
+  endReason: null,
   whiteTimeMs: 5 * 60 * 1000,
   blackTimeMs: 5 * 60 * 1000,
 
@@ -64,6 +67,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       moveHistory: [],
       status: 'playing',
       winner: null,
+      endReason: null,
       whiteTimeMs: ms,
       blackTimeMs: ms,
     });
@@ -101,6 +105,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         playSound('move');
       }
 
+      const isCheckmate = chess.isCheckmate();
+      const isStalemate = chess.isStalemate();
+      const isOver = chess.isGameOver();
+
       set({
         fen: chess.fen(),
         turn: chess.turn(),
@@ -110,10 +118,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         capturedByWhite: nextCapturedByWhite,
         capturedByBlack: nextCapturedByBlack,
         moveHistory: [...moveHistory, move.san],
-        status: chess.isGameOver() ? 'ended' : 'playing',
-        winner: chess.isCheckmate()
+        status: isOver ? 'ended' : 'playing',
+        winner: isCheckmate
           ? (chess.turn() === 'w' ? 'b' : 'w')
-          : chess.isDraw() ? 'draw' : null,
+          : isOver ? 'draw' : null,
+        endReason: isCheckmate
+          ? 'checkmate'
+          : isStalemate ? 'stalemate' : isOver ? 'draw' : null,
       });
       return true;
     } catch {
@@ -125,11 +136,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (color === 'w') {
       const next = Math.max(0, get().whiteTimeMs - deltaMs);
       set({ whiteTimeMs: next });
-      if (next === 0) set({ status: 'ended', winner: 'b' });
+      if (next === 0) set({ status: 'ended', winner: 'b', endReason: 'timeout' });
     } else {
       const next = Math.max(0, get().blackTimeMs - deltaMs);
       set({ blackTimeMs: next });
-      if (next === 0) set({ status: 'ended', winner: 'w' });
+      if (next === 0) set({ status: 'ended', winner: 'w', endReason: 'timeout' });
     }
   },
 
@@ -147,11 +158,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       moveHistory: [],
       status: 'playing',
       winner: null,
+      endReason: null,
     });
   },
 
-  resignGame: (color) => set({ status: 'ended', winner: color === 'w' ? 'b' : 'w' }),
-  offerDraw: () => set({ status: 'ended', winner: 'draw' }),
+  resignGame: (color) => set({ status: 'ended', winner: color === 'w' ? 'b' : 'w', endReason: 'resignation' }),
+  offerDraw: () => set({ status: 'ended', winner: 'draw', endReason: 'draw' }),
   pauseGame: () => set((state) => (state.status === 'playing' ? { status: 'paused' } : {})),
   resumeGame: () => set((state) => (state.status === 'paused' ? { status: 'playing' } : {})),
 }));
