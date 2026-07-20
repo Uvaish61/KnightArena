@@ -267,6 +267,7 @@ export function GameScreen({ navigation, route }: Props) {
         timeMs={blackTimeMs}
         isActive={turn === 'b' && status === 'playing'}
         isAI={mode === 'ai'}
+        isThinking={mode === 'ai' && status === 'playing' && turn === 'b'}
         hasTimer={!!timer}
         captured={capturedByBlack}
         advantage={blackAdvantage}

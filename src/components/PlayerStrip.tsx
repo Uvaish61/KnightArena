@@ -11,6 +11,7 @@ type PlayerStripProps = {
   timeMs: number;
   isActive: boolean;
   isAI?: boolean;
+  isThinking?: boolean;
   hasTimer: boolean;
   captured?: string[];
   advantage?: number;
@@ -23,7 +24,7 @@ const CAPTURED_GLYPHS: Record<'w' | 'b', Record<string, string>> = {
 
 const CAPTURE_ORDER: Record<string, number> = { q: 0, r: 1, b: 2, n: 3, p: 4 };
 
-export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer, captured = [], advantage = 0 }: PlayerStripProps) {
+export function PlayerStrip({ name, piece, timeMs, isActive, isAI, isThinking, hasTimer, captured = [], advantage = 0 }: PlayerStripProps) {
   const ringWidth = useRef(new Animated.Value(1.5)).current;
   const timerScale = useRef(new Animated.Value(1)).current;
 
@@ -81,14 +82,16 @@ export function PlayerStrip({ name, piece, timeMs, isActive, isAI, hasTimer, cap
         <Text style={[styles.name, isActive ? styles.nameActive : styles.nameInactive]} numberOfLines={1}>
           {name}
         </Text>
-        {(sortedCaptured.length > 0 || advantage > 0) && (
+        {isThinking ? (
+          <Text style={styles.thinking}>Thinking…</Text>
+        ) : (sortedCaptured.length > 0 || advantage > 0) ? (
           <View style={styles.capturedRow}>
             <Text style={styles.capturedGlyphs} numberOfLines={1}>
               {sortedCaptured.map((c) => CAPTURED_GLYPHS[capturedColor][c] ?? '').join('')}
             </Text>
             {advantage > 0 && <Text style={styles.advantage}>+{advantage}</Text>}
           </View>
-        )}
+        ) : null}
       </View>
 
       {hasTimer && (
@@ -162,6 +165,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyBold,
     fontSize: 11,
     color: colors.success,
+  },
+  thinking: {
+    marginTop: 2,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 11,
+    color: colors.accent,
   },
   nameInactive: {
     color: colors.textSecondary,
