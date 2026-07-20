@@ -8,6 +8,10 @@ const PIECE_VALUES: Record<string, number> = { p: 100, n: 320, b: 330, r: 500, q
 
 const SEARCH_DEPTH: Record<AIDifficulty, number> = { easy: 0, medium: 1, hard: 3 };
 
+// Well above any achievable material score, so a forced mate always outranks
+// material gains. Kept finite so alpha-beta comparisons stay well-behaved.
+const MATE_SCORE = 1_000_000;
+
 function evaluateBoard(chess: Chess): number {
   let score = 0;
   for (const row of chess.board()) {
@@ -21,7 +25,16 @@ function evaluateBoard(chess: Chess): number {
 }
 
 function negamax(chess: Chess, depth: number, alpha: number, beta: number): number {
-  if (depth === 0 || chess.isGameOver()) {
+  if (chess.isGameOver()) {
+    // The side to move is checkmated — worst outcome for it. The `+ depth` term
+    // means a mate found sooner (more depth remaining) scores higher, so the AI
+    // prefers the fastest forced mate.
+    if (chess.isCheckmate()) return -(MATE_SCORE + depth);
+    // Stalemate, threefold, insufficient material, or 50-move → draw.
+    return 0;
+  }
+
+  if (depth === 0) {
     const perspective = chess.turn() === 'w' ? 1 : -1;
     return perspective * evaluateBoard(chess);
   }
