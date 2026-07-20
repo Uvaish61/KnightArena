@@ -9,7 +9,7 @@ import { PlayerStrip } from '../components/PlayerStrip';
 import { PromotionModal } from '../components/modals/PromotionModal';
 import { GameMenuSheet } from '../components/modals/GameMenuSheet';
 import { CheckAlert } from '../components/game/CheckAlert';
-import { pickAIMove } from '../ai/chessAI';
+import { pickAIMove, shouldAIAcceptDraw } from '../ai/chessAI';
 import { useChessTimer } from '../hooks/useChessTimer';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';

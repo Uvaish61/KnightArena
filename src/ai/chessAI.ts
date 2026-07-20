@@ -40,6 +40,14 @@ function negamax(chess: Chess, depth: number, alpha: number, beta: number): numb
   return best;
 }
 
+// The AI plays Black. `evaluateBoard` is white-positive, so a negative score
+// means Black is ahead. The AI accepts a draw unless Black is clearly winning
+// (more than ~1 pawn up), in which case it plays on for the win.
+export function shouldAIAcceptDraw(fen: string): boolean {
+  const chess = new Chess(fen);
+  return evaluateBoard(chess) >= -100;
+}
+
 export function pickAIMove(fen: string, difficulty: AIDifficulty): AIMove | null {
   const chess = new Chess(fen);
   const moves = chess.moves({ verbose: true }) as Move[];
