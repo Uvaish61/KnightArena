@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, AppState, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -140,6 +140,10 @@ export function GameScreen({ navigation, route }: Props) {
   useEffect(() => {
     setShowCheck(status === 'playing' && chess.inCheck());
   }, [chess, fen, status]);
+
+  // Stable identity so CheckAlert's auto-dismiss timer isn't reset on every
+  // parent re-render (the timer ticks re-render this screen every 100ms).
+  const dismissCheck = useCallback(() => setShowCheck(false), []);
 
   useEffect(() => {
     if (mode !== 'ai' || status !== 'playing' || turn !== 'b') return undefined;
@@ -350,7 +354,7 @@ export function GameScreen({ navigation, route }: Props) {
           quitToHome();
         }}
       />
-      <CheckAlert visible={showCheck} onDismiss={() => setShowCheck(false)} />
+      <CheckAlert visible={showCheck} onDismiss={dismissCheck} />
     </View>
   );
 }
