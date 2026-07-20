@@ -248,6 +248,14 @@ export function GameScreen({ navigation, route }: Props) {
 
   const flipped = mode === 'pvp' && autoFlipBoard && turn === 'b';
 
+  // The side to move is the one in check. Word the alert for whose king it is.
+  const checkSub =
+    mode === 'ai'
+      ? turn === 'w'
+        ? 'Your king is under attack'
+        : `${player2} is in check`
+      : `${turn === 'w' ? player1 : player2}'s king is under attack`;
+
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.navBar}>
@@ -354,7 +362,7 @@ export function GameScreen({ navigation, route }: Props) {
           quitToHome();
         }}
       />
-      <CheckAlert visible={showCheck} onDismiss={dismissCheck} />
+      <CheckAlert visible={showCheck} sub={checkSub} onDismiss={dismissCheck} />
     </View>
   );
 }
