@@ -60,6 +60,12 @@ function MatchRow({
 }) {
   const outcome = getOutcome(match, myColor);
   const isWin = outcome === 'win';
+  const modeLabel =
+    match.mode === 'ai'
+      ? `vs AI${match.aiDifficulty ? ` · ${match.aiDifficulty}` : ''}`
+      : match.mode === 'pvp'
+      ? 'PvP'
+      : null;
 
   return (
     <Swipeable
@@ -80,6 +86,7 @@ function MatchRow({
             {match.player1} vs {match.player2}
           </Text>
           <Text style={styles.matchMeta}>
+            {modeLabel ? `${modeLabel} · ` : ''}
             {formatRelativeTime(match.playedAt)} · {formatDuration(match.durationMs)} · {match.moveCount} moves
           </Text>
         </View>

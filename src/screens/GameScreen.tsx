@@ -73,6 +73,8 @@ export function GameScreen({ navigation, route }: Props) {
     navigation.replace('Result', {
       winner,
       reason: endReason,
+      mode,
+      aiDifficulty: mode === 'ai' ? aiDifficulty ?? 'medium' : undefined,
       player1,
       player2,
       moveCount: moveHistory.length,

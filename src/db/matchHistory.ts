@@ -1,10 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type MatchWinner = 'w' | 'b' | 'draw';
+export type MatchMode = 'pvp' | 'ai';
+export type MatchDifficulty = 'easy' | 'medium' | 'hard';
 
 export interface MatchRecord {
     id: number;
     winner: MatchWinner;
+    // Optional for backward compatibility with matches saved before mode tracking.
+    mode?: MatchMode;
+    aiDifficulty?: MatchDifficulty;
     player1: string;
     player2: string;
     moveCount: number;

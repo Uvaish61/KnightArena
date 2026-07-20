@@ -15,6 +15,8 @@ export type RootStackParamList = {
   Result: {
     winner: 'w' | 'b' | 'draw' | null;
     reason?: 'checkmate' | 'resignation' | 'timeout' | 'stalemate' | 'draw' | null;
+    mode: 'pvp' | 'ai';
+    aiDifficulty?: 'easy' | 'medium' | 'hard';
     player1: string;
     player2: string;
     moveCount: number;

@@ -67,7 +67,7 @@ export function ResultScreen({ navigation, route }: Props) {
   const ringScale = useRef(new Animated.Value(0.6)).current;
   const knightY = useRef(new Animated.Value(-30)).current;
   const knightOpacity = useRef(new Animated.Value(0)).current;
-  const { winner, reason, player1, player2, moveCount, durationMs, pgn, captureCount } = route.params;
+  const { winner, reason, mode, aiDifficulty, player1, player2, moveCount, durationMs, pgn, captureCount } = route.params;
   const normalizedWinner = winner ?? 'draw';
   const outcome = outcomeConfig[normalizedWinner];
   const subtitle = outcomeSubtitle(normalizedWinner, reason);
@@ -80,6 +80,8 @@ export function ResultScreen({ navigation, route }: Props) {
     savedRef.current = true;
     void saveMatch({
       winner: normalizedWinner,
+      mode,
+      aiDifficulty: mode === 'ai' ? aiDifficulty : undefined,
       player1,
       player2,
       moveCount,
@@ -88,7 +90,7 @@ export function ResultScreen({ navigation, route }: Props) {
       captureCount,
       playedAt: new Date().toISOString(),
     });
-  }, [captureCount, durationMs, moveCount, normalizedWinner, pgn, player1, player2]);
+  }, [aiDifficulty, captureCount, durationMs, mode, moveCount, normalizedWinner, pgn, player1, player2]);
 
   useEffect(() => {
     Animated.parallel([
