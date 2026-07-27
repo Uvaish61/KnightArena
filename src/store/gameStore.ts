@@ -109,6 +109,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isStalemate = chess.isStalemate();
       const isOver = chess.isGameOver();
 
+      if (isCheckmate) {
+        playSound('checkmate');
+      } else if (chess.inCheck()) {
+        playSound('check');
+      } else if (isOver) {
+        playSound('gameEnd');
+      }
+
       set({
         fen: chess.fen(),
         turn: chess.turn(),
@@ -136,11 +144,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (color === 'w') {
       const next = Math.max(0, get().whiteTimeMs - deltaMs);
       set({ whiteTimeMs: next });
-      if (next === 0) set({ status: 'ended', winner: 'b', endReason: 'timeout' });
+      if (next === 0) {
+        playSound('gameEnd');
+        set({ status: 'ended', winner: 'b', endReason: 'timeout' });
+      }
     } else {
       const next = Math.max(0, get().blackTimeMs - deltaMs);
       set({ blackTimeMs: next });
-      if (next === 0) set({ status: 'ended', winner: 'w', endReason: 'timeout' });
+      if (next === 0) {
+        playSound('gameEnd');
+        set({ status: 'ended', winner: 'w', endReason: 'timeout' });
+      }
     }
   },
 
@@ -162,8 +176,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  resignGame: (color) => set({ status: 'ended', winner: color === 'w' ? 'b' : 'w', endReason: 'resignation' }),
-  offerDraw: () => set({ status: 'ended', winner: 'draw', endReason: 'draw' }),
+  resignGame: (color) => {
+    playSound('gameEnd');
+    set({ status: 'ended', winner: color === 'w' ? 'b' : 'w', endReason: 'resignation' });
+  },
+  offerDraw: () => {
+    playSound('gameEnd');
+    set({ status: 'ended', winner: 'draw', endReason: 'draw' });
+  },
   pauseGame: () => set((state) => (state.status === 'playing' ? { status: 'paused' } : {})),
   resumeGame: () => set((state) => (state.status === 'paused' ? { status: 'playing' } : {})),
 }));

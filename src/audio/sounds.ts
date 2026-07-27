@@ -6,7 +6,7 @@ import { useSettingsStore } from '../store/settingsStore';
 // respects the device silent switch.
 Sound.setCategory('Ambient', true);
 
-type SoundName = 'move' | 'capture' | 'select';
+type SoundName = 'move' | 'capture' | 'select' | 'check' | 'checkmate' | 'gameEnd';
 
 // Filenames must exist in the app bundle:
 //   Android -> android/app/src/main/res/raw/<name>.wav  (lowercase, no hyphens)
@@ -15,6 +15,9 @@ const FILES: Record<SoundName, string> = {
   move: 'move.wav',
   capture: 'capture.wav',
   select: 'select.wav',
+  check: 'check.wav',
+  checkmate: 'checkmate.wav',
+  gameEnd: 'gameend.wav',
 };
 
 const cache: Partial<Record<SoundName, Sound>> = {};
