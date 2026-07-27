@@ -20,6 +20,7 @@ type ChessBoardProps = {
   lastMove: { from: string; to: string } | null;
   hintMove?: { from: string; to: string } | null;
   checkSquare?: string | null;
+  thinking?: boolean;
   onSquarePress: (square: string) => void;
   flipped?: boolean;
 };
@@ -63,12 +64,21 @@ function squareToGrid(square: string, flipped: boolean | undefined) {
   return { col, row };
 }
 
-export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, checkSquare, onSquarePress, flipped }: ChessBoardProps) {
+export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, checkSquare, thinking, onSquarePress, flipped }: ChessBoardProps) {
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const thinkingOpacity = useRef(new Animated.Value(0)).current;
   const lastAnimatedMoveRef = useRef<string | null>(null);
   const [animatingSquare, setAnimatingSquare] = useState<string | null>(null);
+
+  useEffect(() => {
+    Animated.timing(thinkingOpacity, {
+      toValue: thinking ? 1 : 0,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [thinking, thinkingOpacity]);
 
   useEffect(() => {
     Animated.parallel([
@@ -206,6 +216,8 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
           </Text>
         </Animated.View>
       )}
+
+      <Animated.View pointerEvents="none" style={[styles.thinkingOverlay, { opacity: thinkingOpacity }]} />
     </Animated.View>
   );
 }
@@ -259,5 +271,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 50,
+  },
+  thinkingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(10,8,8,0.28)',
+    borderRadius: 4,
   },
 });

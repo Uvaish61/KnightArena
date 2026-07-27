@@ -292,6 +292,7 @@ export function GameScreen({ navigation, route }: Props) {
   }, [capturedByWhite, capturedByBlack]);
 
   const flipped = mode === 'pvp' && autoFlipBoard && turn === 'b';
+  const aiThinking = mode === 'ai' && status === 'playing' && turn === 'b';
   const hintDisabled = status !== 'playing' || (mode === 'ai' && turn === 'b');
   const undoDisabled = moveHistory.length === 0;
 
@@ -328,7 +329,7 @@ export function GameScreen({ navigation, route }: Props) {
         timeMs={blackTimeMs}
         isActive={turn === 'b' && status === 'playing'}
         isAI={mode === 'ai'}
-        isThinking={mode === 'ai' && status === 'playing' && turn === 'b'}
+        isThinking={aiThinking}
         hasTimer={!!timer}
         captured={capturedByBlack}
         advantage={blackAdvantage}
@@ -342,6 +343,7 @@ export function GameScreen({ navigation, route }: Props) {
           lastMove={lastMove}
           hintMove={hintMove}
           checkSquare={checkSquare}
+          thinking={aiThinking}
           onSquarePress={handleSquarePress}
           flipped={flipped}
         />
