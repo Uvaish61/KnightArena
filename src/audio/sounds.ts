@@ -9,12 +9,12 @@ Sound.setCategory('Ambient', true);
 type SoundName = 'move' | 'capture' | 'select';
 
 // Filenames must exist in the app bundle:
-//   Android -> android/app/src/main/res/raw/<name>.mp3  (lowercase, no hyphens)
+//   Android -> android/app/src/main/res/raw/<name>.wav  (lowercase, no hyphens)
 //   iOS     -> added to the Xcode project bundle
 const FILES: Record<SoundName, string> = {
-  move: 'move.mp3',
-  capture: 'capture.mp3',
-  select: 'select.mp3',
+  move: 'move.wav',
+  capture: 'capture.wav',
+  select: 'select.wav',
 };
 
 const cache: Partial<Record<SoundName, Sound>> = {};
