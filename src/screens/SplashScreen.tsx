@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -49,7 +49,7 @@ export function SplashScreen({ navigation }: Props) {
           <View style={[styles.dot, styles.dotFade1]} />
           <View style={[styles.dot, styles.dotFade2]} />
         </View>
-        <View style={styles.homeIndicator} />
+        {Platform.OS === 'ios' && <View style={styles.homeIndicator} />}
       </View>
     </View>
   );
