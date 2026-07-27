@@ -284,6 +284,8 @@ export function GameScreen({ navigation, route }: Props) {
   }, [capturedByWhite, capturedByBlack]);
 
   const flipped = mode === 'pvp' && autoFlipBoard && turn === 'b';
+  const hintDisabled = status !== 'playing' || (mode === 'ai' && turn === 'b');
+  const undoDisabled = moveHistory.length === 0;
 
   // The side to move is the one in check. Word the alert for whose king it is.
   const checkSub =
@@ -361,13 +363,21 @@ export function GameScreen({ navigation, route }: Props) {
       />
 
       <View style={styles.actionBar}>
-        <Pressable style={styles.actionButton} onPress={handleHint}>
-          <Lightbulb size={18} color={colors.textSecondary} />
-          <Text style={styles.actionLabel}>HINT</Text>
+        <Pressable
+          style={[styles.actionButton, hintDisabled && styles.actionButtonDisabled]}
+          onPress={handleHint}
+          disabled={hintDisabled}
+        >
+          <Lightbulb size={18} color={hintDisabled ? colors.textTertiary : colors.textSecondary} />
+          <Text style={[styles.actionLabel, hintDisabled && styles.actionLabelDisabled]}>HINT</Text>
         </Pressable>
-        <Pressable style={styles.actionButton} onPress={handleUndo}>
-          <RotateCcw size={18} color={colors.textSecondary} />
-          <Text style={styles.actionLabel}>UNDO</Text>
+        <Pressable
+          style={[styles.actionButton, undoDisabled && styles.actionButtonDisabled]}
+          onPress={handleUndo}
+          disabled={undoDisabled}
+        >
+          <RotateCcw size={18} color={undoDisabled ? colors.textTertiary : colors.textSecondary} />
+          <Text style={[styles.actionLabel, undoDisabled && styles.actionLabelDisabled]}>UNDO</Text>
         </Pressable>
         <Pressable style={styles.actionButton} onPress={handleOfferDraw}>
           <Handshake size={18} color={colors.textSecondary} />
@@ -504,6 +514,9 @@ const styles = StyleSheet.create({
   },
   actionButtonResign: {
     backgroundColor: colors.accentMuted,
+  },
+  actionButtonDisabled: {
+    opacity: 0.4,
   },
   actionLabel: {
     fontFamily: fonts.bodySemiBold,
