@@ -526,5 +526,8 @@ const styles = StyleSheet.create({
   actionLabelResign: {
     color: colors.accent,
   },
+  actionLabelDisabled: {
+    color: colors.textTertiary,
+  },
   // modal styles replaced by dedicated components
 });
