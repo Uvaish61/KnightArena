@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, AppState, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AppState, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft, Flag, Handshake, Lightbulb, MoreHorizontal, RotateCcw } from 'lucide-react-native';
@@ -8,6 +8,7 @@ import { ChessBoard } from '../components/ChessBoard';
 import { PlayerStrip } from '../components/PlayerStrip';
 import { PromotionModal } from '../components/modals/PromotionModal';
 import { GameMenuSheet } from '../components/modals/GameMenuSheet';
+import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { CheckAlert } from '../components/game/CheckAlert';
 import { pickAIMove, shouldAIAcceptDraw } from '../ai/chessAI';
 import { useChessTimer } from '../hooks/useChessTimer';
@@ -57,6 +58,14 @@ export function GameScreen({ navigation, route }: Props) {
   const [promotion, setPromotion] = useState<{ from: string; to: string; color: 'w' | 'b' } | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    cancelLabel?: string;
+    destructive?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
   const [hintMove, setHintMove] = useState<{ from: string; to: string } | null>(null);
   const matchStartedAt = useRef(Date.now());
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -96,20 +105,21 @@ export function GameScreen({ navigation, route }: Props) {
     return () => sub.remove();
   }, [pauseGame, resumeGame]);
 
-  const confirmLeave = useMemo(
-    () => () => {
-      if (status !== 'playing') {
-        navigation.goBack();
-        return true;
-      }
-      Alert.alert('Leave match?', 'Your current game progress will be lost.', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Leave', style: 'destructive', onPress: () => navigation.goBack() },
-      ]);
+  const confirmLeave = useCallback(() => {
+    if (status !== 'playing') {
+      navigation.goBack();
       return true;
-    },
-    [status, navigation],
-  );
+    }
+    setConfirmModal({
+      title: 'Leave match?',
+      message: 'Your current game progress will be lost.',
+      confirmLabel: 'Leave',
+      cancelLabel: 'Cancel',
+      destructive: true,
+      onConfirm: () => navigation.goBack(),
+    });
+    return true;
+  }, [status, navigation]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', confirmLeave);
@@ -157,10 +167,14 @@ export function GameScreen({ navigation, route }: Props) {
   }, [mode, status, turn, fen, aiDifficulty, makeMove]);
 
   const handleResign = () => {
-    Alert.alert('Resign?', 'Are you sure you want to resign this match?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Resign', style: 'destructive', onPress: () => resignGame(turn) },
-    ]);
+    setConfirmModal({
+      title: 'Resign?',
+      message: 'Are you sure you want to resign this match?',
+      confirmLabel: 'Resign',
+      cancelLabel: 'Cancel',
+      destructive: true,
+      onConfirm: () => resignGame(turn),
+    });
   };
 
   const handleOfferDraw = () => {
@@ -168,7 +182,12 @@ export function GameScreen({ navigation, route }: Props) {
       if (shouldAIAcceptDraw(fen)) {
         offerDraw();
       } else {
-        Alert.alert('Draw declined', 'The AI declined your draw offer and plays on.');
+        setConfirmModal({
+          title: 'Draw declined',
+          message: 'The AI declined your draw offer and plays on.',
+          confirmLabel: 'OK',
+          onConfirm: () => {},
+        });
       }
       return;
     }
@@ -355,7 +374,7 @@ export function GameScreen({ navigation, route }: Props) {
         }}
         onResign={() => {
           setShowMenu(false);
-          resignGame(turn);
+          handleResign();
         }}
         onQuitHome={() => {
           setShowMenu(false);
@@ -363,6 +382,19 @@ export function GameScreen({ navigation, route }: Props) {
         }}
       />
       <CheckAlert visible={showCheck} sub={checkSub} onDismiss={dismissCheck} />
+      <ConfirmModal
+        visible={!!confirmModal}
+        title={confirmModal?.title ?? ''}
+        message={confirmModal?.message ?? ''}
+        confirmLabel={confirmModal?.confirmLabel ?? 'OK'}
+        cancelLabel={confirmModal?.cancelLabel}
+        destructive={confirmModal?.destructive}
+        onConfirm={() => {
+          confirmModal?.onConfirm();
+          setConfirmModal(null);
+        }}
+        onCancel={confirmModal?.cancelLabel ? () => setConfirmModal(null) : undefined}
+      />
     </View>
   );
 }

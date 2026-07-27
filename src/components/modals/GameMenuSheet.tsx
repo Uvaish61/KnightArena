@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Play, Handshake, RotateCcw, Flag, Home } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -47,12 +47,7 @@ export function GameMenuSheet({ visible, onResume, onOfferDraw, onUndo, onResign
                 label: 'Resign Game',
                 sub: 'Concede defeat to opponent',
                 style: 'destructive' as OptionStyle,
-                onPress: () => {
-                    Alert.alert('Resign?', 'Are you sure you want to resign?', [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Resign', style: 'destructive', onPress: onResign },
-                    ]);
-                },
+                onPress: onResign,
             },
         ],
         [onOfferDraw, onResign, onResume, onUndo],
