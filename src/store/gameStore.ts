@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Chess } from 'chess.js';
 
 import { playSound } from '../audio/sounds';
+import { hapticCapture, hapticCheck, hapticGameEnd, hapticMove, hapticTap } from '../haptics/haptics';
 
 type GameStatus = 'idle' | 'playing' | 'paused' | 'ended';
 type Winner = 'w' | 'b' | 'draw' | null;
@@ -83,6 +84,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (piece && piece.color === chess.turn()) {
       const moves = chess.moves({ square: square as any, verbose: true });
       playSound('select');
+      hapticTap();
       set({ selectedSquare: square, possibleMoves: moves.map((m: any) => m.to) });
     } else {
       set({ selectedSquare: null, possibleMoves: [] });
@@ -101,8 +103,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (move.color === 'w') nextCapturedByWhite.push(move.captured);
         else nextCapturedByBlack.push(move.captured);
         playSound('capture');
+        hapticCapture();
       } else {
         playSound('move');
+        hapticMove();
       }
 
       const isCheckmate = chess.isCheckmate();
@@ -111,10 +115,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       if (isCheckmate) {
         playSound('checkmate');
+        hapticGameEnd();
       } else if (chess.inCheck()) {
         playSound('check');
+        hapticCheck();
       } else if (isOver) {
         playSound('gameEnd');
+        hapticGameEnd();
       }
 
       set({
@@ -146,6 +153,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ whiteTimeMs: next });
       if (next === 0) {
         playSound('gameEnd');
+        hapticGameEnd();
         set({ status: 'ended', winner: 'b', endReason: 'timeout' });
       }
     } else {
@@ -153,6 +161,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ blackTimeMs: next });
       if (next === 0) {
         playSound('gameEnd');
+        hapticGameEnd();
         set({ status: 'ended', winner: 'w', endReason: 'timeout' });
       }
     }
@@ -178,10 +187,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resignGame: (color) => {
     playSound('gameEnd');
+    hapticGameEnd();
     set({ status: 'ended', winner: color === 'w' ? 'b' : 'w', endReason: 'resignation' });
   },
   offerDraw: () => {
     playSound('gameEnd');
+    hapticGameEnd();
     set({ status: 'ended', winner: 'draw', endReason: 'draw' });
   },
   pauseGame: () => set((state) => (state.status === 'playing' ? { status: 'paused' } : {})),

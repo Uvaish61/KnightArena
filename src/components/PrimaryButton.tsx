@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
+import { hapticTap } from '../haptics/haptics';
 import { colors, radii, shadows, spacing } from '../theme/theme';
 
 type PrimaryButtonProps = {
@@ -12,8 +13,13 @@ type PrimaryButtonProps = {
 };
 
 export function PrimaryButton({ label, onPress, style, variant = 'primary', disabled }: PrimaryButtonProps) {
+  const handlePress = () => {
+    hapticTap();
+    onPress();
+  };
+
   return (
-    <Pressable onPress={onPress} disabled={disabled} style={({ pressed }) => [styles.buttonBase, variantStyles[variant], pressed && !disabled && styles.pressed, disabled && styles.disabled, style]}>
+    <Pressable onPress={handlePress} disabled={disabled} style={({ pressed }) => [styles.buttonBase, variantStyles[variant], pressed && !disabled && styles.pressed, disabled && styles.disabled, style]}>
       <Text style={[styles.label, variant === 'secondary' && styles.secondaryLabel]}>{label}</Text>
       <View style={[styles.glow, variant === 'secondary' && styles.secondaryGlow]} />
     </Pressable>

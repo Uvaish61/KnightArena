@@ -11,6 +11,7 @@ import { GameMenuSheet } from '../components/modals/GameMenuSheet';
 import { ConfirmModal } from '../components/modals/ConfirmModal';
 import { CheckAlert } from '../components/game/CheckAlert';
 import { pickAIMove, shouldAIAcceptDraw } from '../ai/chessAI';
+import { hapticTap } from '../haptics/haptics';
 import { useChessTimer } from '../hooks/useChessTimer';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
@@ -215,6 +216,7 @@ export function GameScreen({ navigation, route }: Props) {
     const move = pickAIMove(fen, 'hard');
     if (!move) return;
 
+    hapticTap();
     setHintMove({ from: move.from, to: move.to });
     if (hintTimer.current) clearTimeout(hintTimer.current);
     hintTimer.current = setTimeout(() => setHintMove(null), 3000);
@@ -232,6 +234,8 @@ export function GameScreen({ navigation, route }: Props) {
   const handleUndo = () => {
     const undone = chess.undo();
     if (!undone) return;
+
+    hapticTap();
 
     // In AI mode, also take back the human's move so it's the human's turn again;
     // otherwise the AI would immediately replay its move.
