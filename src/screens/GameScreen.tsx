@@ -206,7 +206,15 @@ export function GameScreen({ navigation, route }: Props) {
       }
       return;
     }
-    offerDraw();
+
+    setConfirmModal({
+      title: 'Offer a draw?',
+      message: `${player1} and ${player2} both need to agree to end the match as a draw.`,
+      confirmLabel: 'End as Draw',
+      cancelLabel: 'Cancel',
+      destructive: true,
+      onConfirm: () => offerDraw(),
+    });
   };
 
   const handleHint = () => {
