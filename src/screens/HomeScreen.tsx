@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowRight, Clock3, History, Settings as SettingsIcon, Swords } from 'lucide-react-native';
 
 import { PrimaryButton } from '../components/PrimaryButton';
+import { Skeleton } from '../components/Skeleton';
 import { Surface } from '../components/Surface';
 import { getAllMatches, MatchRecord } from '../db/matchHistory';
 import type { RootStackParamList } from '../navigation/types';
@@ -15,9 +16,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export function HomeScreen({ navigation }: Props) {
     const insets = useSafeAreaInsets();
     const [latestMatch, setLatestMatch] = useState<MatchRecord | null>(null);
+    const [loadingMatch, setLoadingMatch] = useState(true);
 
     useEffect(() => {
-        void getAllMatches().then((matches) => setLatestMatch(matches[0] ?? null));
+        void getAllMatches().then((matches) => {
+            setLatestMatch(matches[0] ?? null);
+            setLoadingMatch(false);
+        });
     }, []);
 
     return (
@@ -51,9 +56,14 @@ export function HomeScreen({ navigation }: Props) {
             <Surface style={styles.lastMatchCard}>
                 <View style={styles.rowBetween}>
                     <Text style={styles.sectionTitle}>Last Match Result</Text>
-                    <Text style={styles.badge}>{latestMatch ? latestMatch.playedAt.slice(0, 10) : 'No match yet'}</Text>
+                    <Text style={styles.badge}>{loadingMatch ? '···' : latestMatch ? latestMatch.playedAt.slice(0, 10) : 'No match yet'}</Text>
                 </View>
-                {latestMatch ? (
+                {loadingMatch ? (
+                    <View style={styles.matchSkeleton}>
+                        <Skeleton width="60%" height={16} />
+                        <Skeleton width="85%" height={14} style={styles.matchSkeletonGap} />
+                    </View>
+                ) : latestMatch ? (
                     <>
                         <Text style={styles.resultTitle}>{latestMatch.player1} vs {latestMatch.player2}</Text>
                         <Text style={styles.resultCopy}>
@@ -208,6 +218,12 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 16,
         fontWeight: '700',
+    },
+    matchSkeleton: {
+        marginTop: spacing.md,
+    },
+    matchSkeletonGap: {
+        marginTop: 10,
     },
     resultCopy: {
         marginTop: spacing.sm,

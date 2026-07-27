@@ -6,6 +6,7 @@ import { ArrowLeft, Filter as FilterIcon, History, Swords, Trash2 } from 'lucide
 import { Swipeable } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Skeleton } from '../components/Skeleton';
 import { Surface } from '../components/Surface';
 import { deleteMatch, getAllMatches, MatchRecord } from '../db/matchHistory';
 import type { RootStackParamList } from '../navigation/types';
@@ -104,11 +105,13 @@ function MatchRow({
 export function GameHistoryScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [matches, setMatches] = useState<MatchRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
 
   const refreshMatches = useCallback(async () => {
     const nextMatches = await getAllMatches();
     setMatches(nextMatches);
+    setLoading(false);
   }, []);
 
   useFocusEffect(
@@ -184,7 +187,13 @@ export function GameHistoryScreen({ navigation }: Props) {
         </View>
       </Surface>
 
-      {visibleMatches.length === 0 ? (
+      {loading ? (
+        <View style={styles.listContent}>
+          <Skeleton height={70} borderRadius={radii.md} style={styles.rowSkeletonGap} />
+          <Skeleton height={70} borderRadius={radii.md} style={styles.rowSkeletonGap} />
+          <Skeleton height={70} borderRadius={radii.md} />
+        </View>
+      ) : visibleMatches.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyGlyph}>♟</Text>
           <Text style={styles.emptyText}>No matches yet. Play your first game!</Text>
@@ -310,6 +319,9 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: spacing.md,
+  },
+  rowSkeletonGap: {
+    marginBottom: 10,
   },
   matchRow: {
     flexDirection: 'row',
