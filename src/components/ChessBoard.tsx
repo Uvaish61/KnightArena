@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, fonts } from '../theme/theme';
@@ -52,9 +52,22 @@ function parseBoardFromFen(fen: string): Array<Array<{ square: string; piece: st
   return board;
 }
 
+// Converts a chess square to its rendered grid column/row, mirroring the
+// file/rank -> fileIndex/rankIndex mapping used when laying out the board.
+function squareToGrid(square: string, flipped: boolean | undefined) {
+  const file = FILES.indexOf(square[0]);
+  const rank = parseInt(square[1], 10);
+  const col = flipped ? 7 - file : file;
+  const row = flipped ? rank - 1 : 8 - rank;
+  return { col, row };
+}
+
 export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, onSquarePress, flipped }: ChessBoardProps) {
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const lastAnimatedMoveRef = useRef<string | null>(null);
+  const [animatingSquare, setAnimatingSquare] = useState<string | null>(null);
 
   useEffect(() => {
     Animated.parallel([
@@ -63,8 +76,39 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
     ]).start();
   }, [boardScale, boardOpacity]);
 
+  // Slide the moved piece in from its origin square instead of snapping
+  // straight to the destination whenever a new lastMove comes in.
+  useEffect(() => {
+    if (!lastMove) {
+      lastAnimatedMoveRef.current = null;
+      return;
+    }
+
+    const moveKey = `${lastMove.from}->${lastMove.to}`;
+    if (lastAnimatedMoveRef.current === moveKey) return;
+    lastAnimatedMoveRef.current = moveKey;
+
+    const fromGrid = squareToGrid(lastMove.from, flipped);
+    const toGrid = squareToGrid(lastMove.to, flipped);
+    slideAnim.setValue({ x: (fromGrid.col - toGrid.col) * SQ, y: (fromGrid.row - toGrid.row) * SQ });
+    setAnimatingSquare(lastMove.to);
+
+    Animated.spring(slideAnim, {
+      toValue: { x: 0, y: 0 },
+      useNativeDriver: true,
+      damping: 16,
+      stiffness: 210,
+      mass: 0.8,
+    }).start(() => setAnimatingSquare(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMove, flipped]);
+
   const rows = parseBoardFromFen(fen);
   const orderedRows = flipped ? [...rows].reverse() : rows;
+  const animatingPiece = animatingSquare
+    ? rows.flat().find((cell) => cell.square === animatingSquare)?.piece ?? null
+    : null;
+  const animatingGrid = animatingSquare ? squareToGrid(animatingSquare, flipped) : null;
 
   const getSquareBg = (light: boolean, square: string) => {
     if (square === selectedSquare) return light ? colors.boardSelectedLight : colors.boardSelectedDark;
@@ -108,7 +152,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
                     </Text>
                   )}
 
-                  {piece && (
+                  {piece && cell.square !== animatingSquare && (
                     <Text
                       style={[
                         styles.piece,
@@ -140,6 +184,26 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
           </View>
         );
       })}
+
+      {animatingPiece && animatingGrid && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.slidingPiece,
+            {
+              width: SQ,
+              height: SQ,
+              left: animatingGrid.col * SQ,
+              top: animatingGrid.row * SQ,
+              transform: [{ translateX: slideAnim.x }, { translateY: slideAnim.y }],
+            },
+          ]}
+        >
+          <Text style={[styles.piece, animatingPiece.startsWith('w') ? styles.pieceWhite : styles.pieceBlack]}>
+            {PIECES[animatingPiece]}
+          </Text>
+        </Animated.View>
+      )}
     </Animated.View>
   );
 }
@@ -187,5 +251,11 @@ const styles = StyleSheet.create({
   },
   moveDot: {
     position: 'absolute',
+  },
+  slidingPiece: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 50,
   },
 });
