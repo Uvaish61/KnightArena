@@ -155,6 +155,20 @@ export function GameScreen({ navigation, route }: Props) {
   // parent re-render (the timer ticks re-render this screen every 100ms).
   const dismissCheck = useCallback(() => setShowCheck(false), []);
 
+  // Independent of the dismissible toast above, so the board keeps marking
+  // the king in check until the position actually changes.
+  const checkSquare = useMemo(() => {
+    if (status !== 'playing' || !chess.inCheck()) return null;
+    for (const boardRow of chess.board()) {
+      for (const square of boardRow) {
+        if (square && square.type === 'k' && square.color === turn) {
+          return square.square;
+        }
+      }
+    }
+    return null;
+  }, [chess, fen, status, turn]);
+
   useEffect(() => {
     if (mode !== 'ai' || status !== 'playing' || turn !== 'b') return undefined;
 
@@ -313,6 +327,7 @@ export function GameScreen({ navigation, route }: Props) {
           possibleMoves={moveSuggestions ? possibleMoves : []}
           lastMove={lastMove}
           hintMove={hintMove}
+          checkSquare={checkSquare}
           onSquarePress={handleSquarePress}
           flipped={flipped}
         />

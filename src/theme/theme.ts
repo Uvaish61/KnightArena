@@ -42,6 +42,8 @@ export const colors = {
   boardSelectedDark: '#a89a18',
   boardHintLight: '#a7e8c4',
   boardHintDark: '#2f8f5e',
+  boardCheckLight: '#f2908b',
+  boardCheckDark: '#7a1414',
 };
 
 export const fonts = {

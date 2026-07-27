@@ -19,6 +19,7 @@ type ChessBoardProps = {
   possibleMoves: string[];
   lastMove: { from: string; to: string } | null;
   hintMove?: { from: string; to: string } | null;
+  checkSquare?: string | null;
   onSquarePress: (square: string) => void;
   flipped?: boolean;
 };
@@ -62,7 +63,7 @@ function squareToGrid(square: string, flipped: boolean | undefined) {
   return { col, row };
 }
 
-export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, onSquarePress, flipped }: ChessBoardProps) {
+export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, checkSquare, onSquarePress, flipped }: ChessBoardProps) {
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
@@ -112,6 +113,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
 
   const getSquareBg = (light: boolean, square: string) => {
     if (square === selectedSquare) return light ? colors.boardSelectedLight : colors.boardSelectedDark;
+    if (square === checkSquare) return light ? colors.boardCheckLight : colors.boardCheckDark;
     if (square === hintMove?.from || square === hintMove?.to) return light ? colors.boardHintLight : colors.boardHintDark;
     if (square === lastMove?.from || square === lastMove?.to) return light ? colors.boardLastMoveLight : colors.boardLastMoveDark;
     return light ? colors.boardLight : colors.boardDark;
