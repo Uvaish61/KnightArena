@@ -204,6 +204,7 @@ export function GameHistoryScreen({ navigation }: Props) {
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => <MatchRow match={item} myColor="w" onDelete={handleDelete} />}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          style={styles.list}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
@@ -316,6 +317,9 @@ const styles = StyleSheet.create({
   },
   filterChipLabelInactive: {
     color: colors.textSecondary,
+  },
+  list: {
+    flex: 1,
   },
   listContent: {
     paddingBottom: spacing.md,
