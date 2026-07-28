@@ -17,7 +17,7 @@ type ChessBoardProps = {
   fen: string;
   selectedSquare: string | null;
   possibleMoves: string[];
-  lastMove: { from: string; to: string } | null;
+  lastMove: { from: string; to: string; rookFrom?: string; rookTo?: string } | null;
   hintMove?: { from: string; to: string } | null;
   checkSquare?: string | null;
   thinking?: boolean;
@@ -68,9 +68,11 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const rookSlideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const thinkingOpacity = useRef(new Animated.Value(0)).current;
   const lastAnimatedMoveRef = useRef<string | null>(null);
   const [animatingSquare, setAnimatingSquare] = useState<string | null>(null);
+  const [animatingRookSquare, setAnimatingRookSquare] = useState<string | null>(null);
 
   useEffect(() => {
     Animated.timing(thinkingOpacity, {
@@ -111,6 +113,23 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
       stiffness: 210,
       mass: 0.8,
     }).start(() => setAnimatingSquare(null));
+
+    if (lastMove.rookFrom && lastMove.rookTo) {
+      const rookFromGrid = squareToGrid(lastMove.rookFrom, flipped);
+      const rookToGrid = squareToGrid(lastMove.rookTo, flipped);
+      rookSlideAnim.setValue({ x: (rookFromGrid.col - rookToGrid.col) * SQ, y: (rookFromGrid.row - rookToGrid.row) * SQ });
+      setAnimatingRookSquare(lastMove.rookTo);
+
+      Animated.spring(rookSlideAnim, {
+        toValue: { x: 0, y: 0 },
+        useNativeDriver: true,
+        damping: 16,
+        stiffness: 210,
+        mass: 0.8,
+      }).start(() => setAnimatingRookSquare(null));
+    } else {
+      setAnimatingRookSquare(null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMove, flipped]);
 
@@ -120,12 +139,22 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
     ? rows.flat().find((cell) => cell.square === animatingSquare)?.piece ?? null
     : null;
   const animatingGrid = animatingSquare ? squareToGrid(animatingSquare, flipped) : null;
+  const animatingRookPiece = animatingRookSquare
+    ? rows.flat().find((cell) => cell.square === animatingRookSquare)?.piece ?? null
+    : null;
+  const animatingRookGrid = animatingRookSquare ? squareToGrid(animatingRookSquare, flipped) : null;
 
   const getSquareBg = (light: boolean, square: string) => {
     if (square === selectedSquare) return light ? colors.boardSelectedLight : colors.boardSelectedDark;
     if (square === checkSquare) return light ? colors.boardCheckLight : colors.boardCheckDark;
     if (square === hintMove?.from || square === hintMove?.to) return light ? colors.boardHintLight : colors.boardHintDark;
-    if (square === lastMove?.from || square === lastMove?.to) return light ? colors.boardLastMoveLight : colors.boardLastMoveDark;
+    if (
+      square === lastMove?.from ||
+      square === lastMove?.to ||
+      square === lastMove?.rookFrom ||
+      square === lastMove?.rookTo
+    )
+      return light ? colors.boardLastMoveLight : colors.boardLastMoveDark;
     return light ? colors.boardLight : colors.boardDark;
   };
 
@@ -164,7 +193,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
                     </Text>
                   )}
 
-                  {piece && cell.square !== animatingSquare && (
+                  {piece && cell.square !== animatingSquare && cell.square !== animatingRookSquare && (
                     <Text
                       style={[
                         styles.piece,
@@ -213,6 +242,26 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
         >
           <Text style={[styles.piece, animatingPiece.startsWith('w') ? styles.pieceWhite : styles.pieceBlack]}>
             {PIECES[animatingPiece]}
+          </Text>
+        </Animated.View>
+      )}
+
+      {animatingRookPiece && animatingRookGrid && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.slidingPiece,
+            {
+              width: SQ,
+              height: SQ,
+              left: animatingRookGrid.col * SQ,
+              top: animatingRookGrid.row * SQ,
+              transform: [{ translateX: rookSlideAnim.x }, { translateY: rookSlideAnim.y }],
+            },
+          ]}
+        >
+          <Text style={[styles.piece, animatingRookPiece.startsWith('w') ? styles.pieceWhite : styles.pieceBlack]}>
+            {PIECES[animatingRookPiece]}
           </Text>
         </Animated.View>
       )}

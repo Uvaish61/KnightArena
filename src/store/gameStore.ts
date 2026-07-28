@@ -14,7 +14,7 @@ interface GameStore {
   turn: 'w' | 'b';
   selectedSquare: string | null;
   possibleMoves: string[];
-  lastMove: { from: string; to: string } | null;
+  lastMove: { from: string; to: string; rookFrom?: string; rookTo?: string } | null;
   capturedByWhite: string[];
   capturedByBlack: string[];
   moveHistory: string[];
@@ -36,6 +36,19 @@ interface GameStore {
 }
 
 const createFreshChess = () => new Chess();
+
+const CASTLING_ROOK_MOVES: Record<string, { from: string; to: string }> = {
+  'w-k': { from: 'h1', to: 'f1' },
+  'w-q': { from: 'a1', to: 'd1' },
+  'b-k': { from: 'h8', to: 'f8' },
+  'b-q': { from: 'a8', to: 'd8' },
+};
+
+function getCastlingRookMove(color: 'w' | 'b', flags: string) {
+  if (flags.includes('k')) return CASTLING_ROOK_MOVES[`${color}-k`];
+  if (flags.includes('q')) return CASTLING_ROOK_MOVES[`${color}-q`];
+  return null;
+}
 
 export const useGameStore = create<GameStore>((set, get) => ({
   chess: createFreshChess(),
@@ -124,12 +137,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         hapticGameEnd();
       }
 
+      const rookMove = getCastlingRookMove(move.color, move.flags);
+
       set({
         fen: chess.fen(),
         turn: chess.turn(),
         selectedSquare: null,
         possibleMoves: [],
-        lastMove: { from, to },
+        lastMove: { from, to, rookFrom: rookMove?.from, rookTo: rookMove?.to },
         capturedByWhite: nextCapturedByWhite,
         capturedByBlack: nextCapturedByBlack,
         moveHistory: [...moveHistory, move.san],
