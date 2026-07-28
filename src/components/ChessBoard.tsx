@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { colors, fonts } from '../theme/theme';
-
-const BOARD_SIZE = Dimensions.get('window').width - 4;
-const SQ = Math.floor(BOARD_SIZE / 8);
 
 const PIECES: Record<string, string> = {
   wK: '♔', wQ: '♕', wR: '♖', wB: '♗', wN: '♘', wP: '♙',
@@ -65,6 +62,8 @@ function squareToGrid(square: string, flipped: boolean | undefined) {
 }
 
 export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintMove, checkSquare, thinking, onSquarePress, flipped }: ChessBoardProps) {
+  const { width } = useWindowDimensions();
+  const sq = Math.floor((width - 4) / 8);
   const boardScale = useRef(new Animated.Value(0.84)).current;
   const boardOpacity = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
