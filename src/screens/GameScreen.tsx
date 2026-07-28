@@ -69,6 +69,8 @@ export function GameScreen({ navigation, route }: Props) {
   } | null>(null);
   const [hintMove, setHintMove] = useState<{ from: string; to: string } | null>(null);
   const matchStartedAt = useRef(Date.now());
+  const pausedDurationMs = useRef(0);
+  const pausedAt = useRef<number | null>(null);
   const hintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useChessTimer(!!timer && status === 'playing');
@@ -89,7 +91,7 @@ export function GameScreen({ navigation, route }: Props) {
       player2,
       moveCount: moveHistory.length,
       pgn: chess.pgn(),
-      durationMs: Date.now() - matchStartedAt.current,
+      durationMs: Date.now() - matchStartedAt.current - pausedDurationMs.current,
       captureCount: capturedByWhite.length + capturedByBlack.length,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,8 +100,13 @@ export function GameScreen({ navigation, route }: Props) {
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
       if (next === 'background' || next === 'inactive') {
+        if (pausedAt.current === null) pausedAt.current = Date.now();
         pauseGame();
       } else if (next === 'active') {
+        if (pausedAt.current !== null) {
+          pausedDurationMs.current += Date.now() - pausedAt.current;
+          pausedAt.current = null;
+        }
         resumeGame();
       }
     });
