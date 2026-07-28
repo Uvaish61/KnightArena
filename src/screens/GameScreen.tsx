@@ -182,13 +182,14 @@ export function GameScreen({ navigation, route }: Props) {
   }, [mode, status, turn, fen, aiDifficulty, makeMove]);
 
   const handleResign = () => {
+    const resigningColor = mode === 'ai' ? 'w' : turn;
     setConfirmModal({
       title: 'Resign?',
       message: 'Are you sure you want to resign this match?',
       confirmLabel: 'Resign',
       cancelLabel: 'Cancel',
       destructive: true,
-      onConfirm: () => resignGame(turn),
+      onConfirm: () => resignGame(resigningColor),
     });
   };
 
