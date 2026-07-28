@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowRight, Clock3, History, Settings as SettingsIcon, Swords } from 'lucide-react-native';
 
@@ -18,12 +19,14 @@ export function HomeScreen({ navigation }: Props) {
     const [latestMatch, setLatestMatch] = useState<MatchRecord | null>(null);
     const [loadingMatch, setLoadingMatch] = useState(true);
 
-    useEffect(() => {
-        void getAllMatches().then((matches) => {
-            setLatestMatch(matches[0] ?? null);
-            setLoadingMatch(false);
-        });
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            void getAllMatches().then((matches) => {
+                setLatestMatch(matches[0] ?? null);
+                setLoadingMatch(false);
+            });
+        }, []),
+    );
 
     return (
         <View style={[styles.container, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.md }]}>
