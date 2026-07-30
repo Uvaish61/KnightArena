@@ -102,7 +102,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
 
     const fromGrid = squareToGrid(lastMove.from, flipped);
     const toGrid = squareToGrid(lastMove.to, flipped);
-    slideAnim.setValue({ x: (fromGrid.col - toGrid.col) * SQ, y: (fromGrid.row - toGrid.row) * SQ });
+    slideAnim.setValue({ x: (fromGrid.col - toGrid.col) * sq, y: (fromGrid.row - toGrid.row) * sq });
     setAnimatingSquare(lastMove.to);
 
     Animated.spring(slideAnim, {
@@ -116,7 +116,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
     if (lastMove.rookFrom && lastMove.rookTo) {
       const rookFromGrid = squareToGrid(lastMove.rookFrom, flipped);
       const rookToGrid = squareToGrid(lastMove.rookTo, flipped);
-      rookSlideAnim.setValue({ x: (rookFromGrid.col - rookToGrid.col) * SQ, y: (rookFromGrid.row - rookToGrid.row) * SQ });
+      rookSlideAnim.setValue({ x: (rookFromGrid.col - rookToGrid.col) * sq, y: (rookFromGrid.row - rookToGrid.row) * sq });
       setAnimatingRookSquare(lastMove.rookTo);
 
       Animated.spring(rookSlideAnim, {
@@ -161,7 +161,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
     <Animated.View
       style={[
         styles.board,
-        { width: SQ * 8, height: SQ * 8, transform: [{ scale: boardScale }], opacity: boardOpacity },
+        { width: sq * 8, height: sq * 8, transform: [{ scale: boardScale }], opacity: boardOpacity },
       ]}
     >
       {orderedRows.map((row, rankIndex) => {
@@ -178,7 +178,7 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
               return (
                 <Pressable
                   key={cell.square}
-                  style={[styles.square, { width: SQ, height: SQ, backgroundColor: getSquareBg(light, cell.square) }]}
+                  style={[styles.square, { width: sq, height: sq, backgroundColor: getSquareBg(light, cell.square) }]}
                   onPress={() => onSquarePress(cell.square)}
                 >
                   {fileIndex === 0 && (
@@ -208,9 +208,9 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
                       style={[
                         styles.moveDot,
                         {
-                          width: piece ? SQ * 0.85 : SQ * 0.28,
-                          height: piece ? SQ * 0.85 : SQ * 0.28,
-                          borderRadius: SQ,
+                          width: piece ? sq * 0.85 : sq * 0.28,
+                          height: piece ? sq * 0.85 : sq * 0.28,
+                          borderRadius: sq,
                           backgroundColor: piece ? 'rgba(0,0,0,0.22)' : 'rgba(0,0,0,0.18)',
                           borderWidth: piece ? 3 : 0,
                           borderColor: 'rgba(0,0,0,0.18)',
@@ -231,10 +231,10 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
           style={[
             styles.slidingPiece,
             {
-              width: SQ,
-              height: SQ,
-              left: animatingGrid.col * SQ,
-              top: animatingGrid.row * SQ,
+              width: sq,
+              height: sq,
+              left: animatingGrid.col * sq,
+              top: animatingGrid.row * sq,
               transform: [{ translateX: slideAnim.x }, { translateY: slideAnim.y }],
             },
           ]}
@@ -251,10 +251,10 @@ export function ChessBoard({ fen, selectedSquare, possibleMoves, lastMove, hintM
           style={[
             styles.slidingPiece,
             {
-              width: SQ,
-              height: SQ,
-              left: animatingRookGrid.col * SQ,
-              top: animatingRookGrid.row * SQ,
+              width: sq,
+              height: sq,
+              left: animatingRookGrid.col * sq,
+              top: animatingRookGrid.row * sq,
               transform: [{ translateX: rookSlideAnim.x }, { translateY: rookSlideAnim.y }],
             },
           ]}

@@ -58,12 +58,12 @@ export function GameSetupScreen({ navigation }: Props) {
                 </View>
 
                 <View style={styles.fieldBlock}>
-                    <Text style={styles.fieldLabel}>Player 1</Text>
-                    <TextInput value={player1} onChangeText={setPlayer1} placeholder="White" placeholderTextColor={colors.textMuted} style={styles.input} />
+                    <Text style={styles.fieldLabel}>{mode === 'ai' ? 'Your Name' : 'Player 1'}</Text>
+                    <TextInput value={player1} onChangeText={setPlayer1} placeholder={mode === 'ai' ? 'You' : 'White'} placeholderTextColor={colors.textMuted} style={styles.input} />
                 </View>
                 <View style={styles.fieldBlock}>
-                    <Text style={styles.fieldLabel}>{mode === 'ai' ? 'Human Player' : 'Player 2'}</Text>
-                    <TextInput value={player2} onChangeText={setPlayer2} placeholder={mode === 'ai' ? 'You' : 'Black'} placeholderTextColor={colors.textMuted} style={styles.input} />
+                    <Text style={styles.fieldLabel}>{mode === 'ai' ? 'AI Name' : 'Player 2'}</Text>
+                    <TextInput value={player2} onChangeText={setPlayer2} placeholder={mode === 'ai' ? 'Knight AI' : 'Black'} placeholderTextColor={colors.textMuted} style={styles.input} />
                 </View>
 
                 <View style={styles.fieldBlock}>
